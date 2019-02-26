@@ -34,8 +34,12 @@ public class Enemy extends Character implements CharacterInterface{
     private Animation bloodAnimation;
     private Animation dieRightAnimation;
     private Animation dieLeftAnimation;
+    private Animation freezeAnimation;
+    private Animation frozenAnimation;
     private boolean playerInRange = false;
     private boolean canAttack = true;
+    private boolean isFreezing = false;
+    private boolean isFrozen = false;
     private PathFinder pathFinder;
     private int attackTimer = 0;
     private Player player;
@@ -44,8 +48,8 @@ public class Enemy extends Character implements CharacterInterface{
     
     
     
-    public Enemy(int x, int y, int speed, int health, Player player) throws IOException {
-        super(x, y, speed, health);
+    public Enemy(int x, int y, int width, int height, int speed, int health, Player player) throws IOException {
+        super(x, y, width, height, speed, health);
         
         pathFinder = new PathFinder(this, player);
         this.player = player;
@@ -62,6 +66,9 @@ public class Enemy extends Character implements CharacterInterface{
         bloodAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/blood", "blood", 6, 100, 100), 1);
         dieRightAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "die_right", 5, 100, 100), 1);
         dieLeftAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "die_left", 5, 100, 100), 1);
+        freezeAnimation = new Animation(60, 1, getAnimationFrames("src/res/effects/freeze", "freeze", 6, 100, 100), 1);
+        frozenAnimation = new Animation(60, 5, getAnimationFrames("src/res/effects/freeze", "frozen", 1, 100, 100), 1);
+        
         
     }
 
@@ -103,6 +110,12 @@ public class Enemy extends Character implements CharacterInterface{
                 else
                     dieLeftAnimation.run(x, y, graphics, observer);
             }
+            if(isFreezing){
+                freezeAnimation.run(x, y, graphics, observer);
+            }
+            if(isFrozen){
+                frozenAnimation.run(x, y, graphics, observer);
+            }
      
         }catch(EndSingleAnimationException e){
 
@@ -129,6 +142,14 @@ public class Enemy extends Character implements CharacterInterface{
                 attackLeftAnimation.setState(0);
                 attackRightAnimation.setTicks(0);
                 attackLeftAnimation.setTicks(0);
+            }
+            if(isFreezing){
+                isFrozen = true;
+                isFreezing = false; 
+            }
+            if(isFrozen){
+                isFrozen = false;
+                isLocked = false;
             }
                 
         }
@@ -247,6 +268,12 @@ public class Enemy extends Character implements CharacterInterface{
         else
             takesDamage = true;
         
+    }
+    
+    public void freeze(){
+        isLocked = true;
+        stopMovement();
+        isFrozen = true;
     }
 
     public void checkPlayerInRange(Player player){

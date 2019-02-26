@@ -57,8 +57,8 @@ public class Player extends Character implements CharacterInterface{
 
     
     // Constructors.
-    public Player(int x, int y, int speed, int health, int magicPower) throws IOException{
-        super(x, y, speed, health);
+    public Player(int x, int y, int width, int height, int speed, int health, int magicPower) throws IOException{
+        super(x, y, width, height, speed, health);
         this.magicPower = magicPower;
 
         fireballsList = new ArrayList<>();

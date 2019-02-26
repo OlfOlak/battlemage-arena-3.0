@@ -53,6 +53,8 @@ public abstract class Character implements CharacterInterface{
     protected Rectangle leftRangeBox;
     protected Rectangle rightRangeBox;
     protected Rectangle healthBar;
+    protected int width;
+    protected int height;
     protected Sprite sprite;
 
 
@@ -63,10 +65,12 @@ public abstract class Character implements CharacterInterface{
     protected int meleeRangeY;
 
     // Constructors.
-    public Character(int x, int y, int speed, int health) throws IOException {
+    public Character(int x, int y, int width, int height, int speed, int health) throws IOException {
         
         this.x = x;
         this.y = y;
+        this.width = width;
+        this.height = height;
         this.speed = speed;
         this.health = health;
         this.maxHealth = health;

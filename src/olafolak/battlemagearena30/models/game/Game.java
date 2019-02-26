@@ -50,12 +50,12 @@ public class Game extends Canvas implements Runnable {
         addKeyListener(new KeyControl(this));
         try{
             allEnemysList = new ArrayList<>();
-            player = new Player(100, 100, 7, 100, 100);
-            enemy = new Enemy(400, 400, 1, 150, player);
+            player = new Player(100, 100, 100, 100, 7, 10000, 100);
+            enemy = new Enemy(400, 600, 100, 100, 0, 150, player);
             allEnemysList.add(enemy);
-            enemy = new Enemy(500, 300, 2, 100, player);
+            enemy = new Enemy(500, 300, 100, 100, 0, 100, player);
             allEnemysList.add(enemy);
-            //enemy = new Enemy(700, 300, 1, 100, player);
+            //enemy = new Enemy(700, 300, 100, 100, 1, 100, player);
             //allEnemysList.add(enemy);
             arena = new Arena((WIDTH * SCALE), (HEIGHT * SCALE));
             
