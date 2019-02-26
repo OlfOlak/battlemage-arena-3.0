@@ -26,9 +26,10 @@ import olafolak.battlemagearena30.models.world.Arena;
  */
 public class Game extends Canvas implements Runnable {
 
-    public static final double WIDTH = 256.0;
-    public static final double HEIGHT = WIDTH * 3 / 5;
     public static final int SCALE = 5;
+    public static final double WIDTH = 256.0 * SCALE;
+    public static final double HEIGHT = WIDTH * 3 / 5 * SCALE;
+    
     public final String TITLE = "Battlemage Arena 3.0";
     
     private boolean running = false;
@@ -50,12 +51,12 @@ public class Game extends Canvas implements Runnable {
         addKeyListener(new KeyControl(this));
         try{
             allEnemysList = new ArrayList<>();
-            player = new Player(100, 100, 100, 100, 7, 10000, 100);
-            enemy = new Enemy(400, 600, 100, 100, 0, 150, player);
+            player = new Player(100, 100, 7, 10000, 100);
+            enemy = new Enemy(400, 600, 0, 150, player);
             allEnemysList.add(enemy);
-            enemy = new Enemy(500, 300, 100, 100, 0, 100, player);
-            allEnemysList.add(enemy);
-            //enemy = new Enemy(700, 300, 100, 100, 1, 100, player);
+            //enemy = new Enemy(500, 300, 0, 100, player);
+            //allEnemysList.add(enemy);
+            //enemy = new Enemy(700, 300, 1, 100, player);
             //allEnemysList.add(enemy);
             arena = new Arena((WIDTH * SCALE), (HEIGHT * SCALE));
             

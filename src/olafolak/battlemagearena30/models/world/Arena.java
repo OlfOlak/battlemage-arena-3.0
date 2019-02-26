@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import olafolak.battlemagearena30.controllers.GameController;
 import olafolak.battlemagearena30.models.game.Game;
+import olafolak.battlemagearena30.models.sprites.BoundsBox;
 
 /**
  *
@@ -25,6 +26,7 @@ public class Arena {
     private int tilesW = 5;
     private int tilesH = 3;
     private ArrayList<ArrayList<Image>> tilesList;
+    public static BoundsBox movementArea;
     
     public Arena(double w, double h){
         

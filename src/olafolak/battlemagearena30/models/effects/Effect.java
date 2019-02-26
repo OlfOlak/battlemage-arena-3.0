@@ -18,7 +18,7 @@ import static olafolak.battlemagearena30.models.characters.Player.scale;
  *
  * @author OlafPC
  */
-public class Effect {
+public abstract class Effect {
     
     //Technical fields.
     protected int x;
@@ -31,12 +31,13 @@ public class Effect {
     protected ArrayList<Enemy> enemysList;
     protected Rectangle damageArea;
     
+    // Bounds.
+    
+    
     // Constructors.
     public Effect(int x, int y, int range, boolean rightDirection, ArrayList<Enemy> enemysList) throws IOException{
         this.x = x;
         this.y = y;
-        originX = x + 30;
-        originY = y + 18;
         this.range = range;
         isHeadedRight = rightDirection;
         this.enemysList = enemysList;

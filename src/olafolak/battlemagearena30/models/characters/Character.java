@@ -16,7 +16,10 @@ import olafolak.battlemagearena30.models.animations.Animation;
 import static olafolak.battlemagearena30.models.characters.Player.scale;
 import olafolak.battlemagearena30.models.exceptions.CharacterDiesException;
 import olafolak.battlemagearena30.models.game.Game;
+import static olafolak.battlemagearena30.models.game.Game.*;
+import olafolak.battlemagearena30.models.sprites.BoundsBox;
 import olafolak.battlemagearena30.models.utilities.ImageFlip;
+import static olafolak.battlemagearena30.models.world.Arena.movementArea;
 
 public abstract class Character implements CharacterInterface{
 
@@ -49,39 +52,39 @@ public abstract class Character implements CharacterInterface{
     protected Animation walkLeftAnimation;
     protected Animation attackRightAnimation;
     protected Animation attackLeftAnimation;
-    protected Rectangle boundsBox;
-    protected Rectangle leftRangeBox;
-    protected Rectangle rightRangeBox;
-    protected Rectangle healthBar;
-    protected int width;
-    protected int height;
+    protected BoundsBox boundsBox;
+    protected BoundsBox leftRangeBox;
+    protected BoundsBox rightRangeBox;
+    protected BoundsBox healthBar;
     protected Sprite sprite;
-
-
+    
     // Attribute fields.
     protected int health;
     protected int maxHealth;
-    protected int meleeRangeX;
-    protected int meleeRangeY;
+    
+    // Bounds.
+    public static int characterWidth = (int)(WIDTH * (100.0 / WIDTH));
+    public static int characterHeight = (int)(HEIGHT * (100.0 / HEIGHT));
+    protected int meleeRangeX = (int)(0.4 * characterWidth);
+    protected int meleeRangeY = (int)(0.4 * characterHeight);
+    protected int healthBarWidth = characterWidth;
+    protected int healthBarHeight = (int)(0.1 * characterHeight);
 
     // Constructors.
-    public Character(int x, int y, int width, int height, int speed, int health) throws IOException {
+    public Character(int x, int y, int speed, int health) throws IOException {
         
         this.x = x;
         this.y = y;
-        this.width = width;
-        this.height = height;
+        this.originX = x + (characterWidth / 2);
+        this.originY = y + (characterHeight / 2);
         this.speed = speed;
         this.health = health;
         this.maxHealth = health;
 
-        meleeRangeX = 40;
-        meleeRangeY = 40;
-
-        boundsBox = new Rectangle(x, y, 100, 100);
-        leftRangeBox = new Rectangle(x - (meleeRangeX / 2), y + 50 - (meleeRangeY / 2), meleeRangeX, meleeRangeY);
-        rightRangeBox = new Rectangle(x + 100 - (meleeRangeX / 2), y + 50 - (meleeRangeY / 2), meleeRangeX, meleeRangeY);
-        healthBar = new Rectangle(x, y - 10, health * 100 / maxHealth, 10);
+        boundsBox = new BoundsBox(originX, originY, (int)characterWidth, (int)characterHeight);
+        leftRangeBox = new BoundsBox(x, originY, meleeRangeX, meleeRangeY);
+        rightRangeBox = new BoundsBox(x + characterWidth, originY, meleeRangeX, meleeRangeY);
+        healthBar = new BoundsBox(originX, y - (healthBarHeight / 2), health * healthBarWidth / maxHealth, healthBarHeight);
 
     }
 
@@ -103,18 +106,18 @@ public abstract class Character implements CharacterInterface{
     
     protected void updateBounds(){
         
-        originX = x + 50;
-        originY = y + 50;
+        originX = x + (characterWidth / 2);
+        originY = y + (characterHeight / 2);
         
-        boundsBox.setBounds(x, y, 100, 100);
-        leftRangeBox.setBounds(x - (meleeRangeX / 2), y + 50 - (meleeRangeY / 2), meleeRangeX, meleeRangeY);
-        rightRangeBox.setBounds(x + 100 - (meleeRangeX / 2), y + 50 - (meleeRangeY / 2), meleeRangeX, meleeRangeY);
-        healthBar.setBounds(x, y - 10, health * 100 / maxHealth, 10);
+        boundsBox.setBoundsByOrigin(originX, originY, characterWidth, characterHeight);
+        leftRangeBox.setBoundsByOrigin(x, originY, meleeRangeX, meleeRangeY);
+        rightRangeBox.setBoundsByOrigin(x + characterWidth, originY, meleeRangeX, meleeRangeY);
+        healthBar.setBounds(x, y - healthBarHeight, health * healthBarWidth / maxHealth, healthBarHeight);
         
     }
     
     protected void checkArenaCollisions(){
-        
+
         if(x >= 1180)
             canGoRight = false;
         if(x <= 0)
@@ -364,37 +367,10 @@ public abstract class Character implements CharacterInterface{
         this.attackLeftAnimation = attackLeftAnimation;
     }
 
-    public Rectangle getBoundsBox() {
-        return boundsBox;
-    }
-
-    public void setBoundsBox(Rectangle boundsBox) {
-        this.boundsBox = boundsBox;
-    }
-
-    public Rectangle getLeftRangeBox() {
-        return leftRangeBox;
-    }
-
-    public void setLeftRangeBox(Rectangle leftRangeBox) {
-        this.leftRangeBox = leftRangeBox;
-    }
-
-    public Rectangle getRightRangeBox() {
-        return rightRangeBox;
-    }
-
-    public void setRightRangeBox(Rectangle rightRangeBox) {
-        this.rightRangeBox = rightRangeBox;
-    }
-
     public Rectangle getHealthBar() {
         return healthBar;
     }
 
-    public void setHealthBar(Rectangle healthBar) {
-        this.healthBar = healthBar;
-    }
 
     public Sprite getSprite() {
         return sprite;
@@ -435,6 +411,72 @@ public abstract class Character implements CharacterInterface{
     public void setMeleeRangeY(int meleeRangeY) {
         this.meleeRangeY = meleeRangeY;
     }
+
+    public boolean isIsIdle() {
+        return isIdle;
+    }
+
+    public void setIsIdle(boolean isIdle) {
+        this.isIdle = isIdle;
+    }
+
+    public boolean isIsMoving() {
+        return isMoving;
+    }
+
+    public void setIsMoving(boolean isMoving) {
+        this.isMoving = isMoving;
+    }
+
+    public boolean isIsLocked() {
+        return isLocked;
+    }
+
+    public void setIsLocked(boolean isLocked) {
+        this.isLocked = isLocked;
+    }
+
+    public BoundsBox getBoundsBox() {
+        return boundsBox;
+    }
+
+    public void setBoundsBox(BoundsBox boundsBox) {
+        this.boundsBox = boundsBox;
+    }
+
+    public BoundsBox getLeftRangeBox() {
+        return leftRangeBox;
+    }
+
+    public void setLeftRangeBox(BoundsBox leftRangeBox) {
+        this.leftRangeBox = leftRangeBox;
+    }
+
+    public BoundsBox getRightRangeBox() {
+        return rightRangeBox;
+    }
+
+    public void setRightRangeBox(BoundsBox rightRangeBox) {
+        this.rightRangeBox = rightRangeBox;
+    }
+
+    public int getCharacterWidth() {
+        return characterWidth;
+    }
+
+    public void setCharacterWidth(int characterWidth) {
+        this.characterWidth = characterWidth;
+    }
+
+    public int getCharacterHeight() {
+        return characterHeight;
+    }
+
+    public void setCharacterHeight(int characterHeight) {
+        this.characterHeight = characterHeight;
+    }
+    
+    
     
         
         

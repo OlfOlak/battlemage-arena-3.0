@@ -9,10 +9,8 @@ package olafolak.battlemagearena30.models.characters;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import javax.imageio.ImageIO;
 import olafolak.battlemagearena30.models.animations.Animation;
 import olafolak.battlemagearena30.models.effects.Fireball;
 import olafolak.battlemagearena30.models.effects.IceBreath;
@@ -21,6 +19,9 @@ import olafolak.battlemagearena30.models.exceptions.EndOfIceBreathException;
 import olafolak.battlemagearena30.models.exceptions.EndSingleAnimationException;
 import olafolak.battlemagearena30.models.exceptions.PlayerDiesException;
 import olafolak.battlemagearena30.models.game.Game;
+import static olafolak.battlemagearena30.models.game.Game.HEIGHT;
+import static olafolak.battlemagearena30.models.game.Game.WIDTH;
+
 
 /**
  *
@@ -50,35 +51,47 @@ public class Player extends Character implements CharacterInterface{
     
     private ArrayList<Enemy> enemysList;
     
+    private int width = 100;
+    private int height = 100;
     
     // Attribute fields.
     private int magicPower;
     
-
+    // Bounds.
+    public static int characterWidth = (int)(WIDTH * (100.0 / WIDTH));
+    public static int characterHeight = (int)(HEIGHT * (100.0 / HEIGHT));
+    private int magicShieldWidth = (int)(4.2 * characterWidth);
+    private int magicShieldHeight = (int)(4.12 * characterHeight);
+    private int magicShieldAbsorbWidth = (int)(4.26 * characterWidth);
+    private int magicShieldAbsorbHeight = (int)(4.12 * characterHeight);
+    private int castFireballWidth = (int)(1.5 * characterWidth);
+    private int castFireballHeight = (int)(1.5 * characterHeight);
+    private int castIceBreathWidth = (int)(1.5 * characterWidth);
+    private int castIceBreathHeight = (int)(1.5 * characterHeight);
     
     // Constructors.
-    public Player(int x, int y, int width, int height, int speed, int health, int magicPower) throws IOException{
-        super(x, y, width, height, speed, health);
+    public Player(int x, int y, int speed, int health, int magicPower) throws IOException{
+        super(x, y, speed, health);
         this.magicPower = magicPower;
 
         fireballsList = new ArrayList<>();
         enemysList = new ArrayList<>();
         
-        idleRightAnimation = new Animation(60, 0.85, getAnimationFrames("src/res/sprites/elfmage", "idle_right", 5, 100, 100), 0);
-        idleLeftAnimation = new Animation(60, 0.85, getAnimationFrames("src/res/sprites/elfmage", "idle_left", 5, 100, 100), 0);
-        walkRightAnimation = new Animation(60, 0.2, getAnimationFrames("src/res/sprites/elfmage", "walk_right", 5, 100, 100), 0);
-        walkLeftAnimation = new Animation(60, 0.2, getAnimationFrames("src/res/sprites/elfmage", "walk_left", 5, 100, 100), 0);
-        attackRightAnimation = new Animation (60, 0.2, getAnimationFrames("src/res/sprites/elfmage", "attack_right", 5, 100, 100), 1);
-        attackLeftAnimation = new Animation (60, 0.2, getAnimationFrames("src/res/sprites/elfmage", "attack_left", 5, 100, 100), 1); 
-        hurtRightAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/sprites/elfmage", "hurt_right", 5, 100, 100), 1);
-        hurtLeftAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/sprites/elfmage", "hurt_left", 5, 100, 100), 1);
-        bloodAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/blood", "blood", 6, 100, 100), 1);
-        dieRightAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/elfmage", "die_right", 5, 100, 100), 1);
-        dieLeftAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/elfmage", "die_left", 5, 100, 100), 1);
-        magicShieldAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/magicShield", "magicShield", 5, 420, 412), 0);
-        magicShieldAbsorbAnimation = new Animation(60, 0.1, getAnimationFrames("src/res/effects/magicShield", "magicShield_absorb", 7, 426, 412), 1);
-        castFireballAnimation = new Animation(60, 1, getAnimationFrames("src/res/effects/fireball", "cast", 11, 150, 150), 1);
-        castIceBreathAnimation = new Animation(60, 1, getAnimationFrames("src/res/effects/iceBreath", "iceBreath_cast", 13, 150, 150), 1);
+        idleRightAnimation = new Animation(60, 0.85, getAnimationFrames("src/res/sprites/elfmage", "idle_right", 5, characterWidth, characterHeight), 0);
+        idleLeftAnimation = new Animation(60, 0.85, getAnimationFrames("src/res/sprites/elfmage", "idle_left", 5, characterWidth, characterHeight), 0);
+        walkRightAnimation = new Animation(60, 0.2, getAnimationFrames("src/res/sprites/elfmage", "walk_right", 5, characterWidth, characterHeight), 0);
+        walkLeftAnimation = new Animation(60, 0.2, getAnimationFrames("src/res/sprites/elfmage", "walk_left", 5, characterWidth, characterHeight), 0);
+        attackRightAnimation = new Animation (60, 0.2, getAnimationFrames("src/res/sprites/elfmage", "attack_right", 5, characterWidth, characterHeight), 1);
+        attackLeftAnimation = new Animation (60, 0.2, getAnimationFrames("src/res/sprites/elfmage", "attack_left", 5, characterWidth, characterHeight), 1); 
+        hurtRightAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/sprites/elfmage", "hurt_right", 5, characterWidth, characterHeight), 1);
+        hurtLeftAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/sprites/elfmage", "hurt_left", 5, characterWidth, characterHeight), 1);
+        bloodAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/blood", "blood", 6, characterWidth, characterHeight), 1);
+        dieRightAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/elfmage", "die_right", 5, characterWidth, characterHeight), 1);
+        dieLeftAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/elfmage", "die_left", 5, characterWidth, characterHeight), 1);
+        magicShieldAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/magicShield", "magicShield", 5, magicShieldWidth, magicShieldHeight), 0);
+        magicShieldAbsorbAnimation = new Animation(60, 0.1, getAnimationFrames("src/res/effects/magicShield", "magicShield_absorb", 7, magicShieldAbsorbWidth, magicShieldAbsorbHeight), 1);
+        castFireballAnimation = new Animation(60, 1, getAnimationFrames("src/res/effects/fireball", "cast", 11, castFireballWidth, castFireballHeight), 1);
+        castIceBreathAnimation = new Animation(60, 1, getAnimationFrames("src/res/effects/iceBreath", "iceBreath_cast", 13, castIceBreathWidth, castIceBreathHeight), 1);
         
     }
     
@@ -87,44 +100,6 @@ public class Player extends Character implements CharacterInterface{
     public void draw(Graphics graphics, Game observer) throws PlayerDiesException{
         
         try{
-            
-            /*switch(animState){
-                case 0:
-                    if(isHeadedRight == true)
-                        idleRightAnimation.run(x, y, graphics, observer);
-                    else
-                        idleLeftAnimation.run(x, y, graphics, observer);
-                    break;
-                case 1:
-                    if(isHeadedRight == true)
-                        walkRightAnimation.run(x, y, graphics, observer);
-                    else
-                        walkLeftAnimation.run(x, y, graphics, observer);
-                    break;
-                case 2:
-                    if(isHeadedRight == true)
-                        attackRightAnimation.run(x, y, graphics, observer);
-                    else
-                        attackLeftAnimation.run(x, y, graphics, observer);
-                    break;
-                case 3:
-                    if(isHeadedRight == true){
-                        hurtRightAnimation.run(x, y, graphics, observer);
-                    }
-                    else{
-                        hurtLeftAnimation.run(x, y, graphics, observer);
-                    }
-                    bloodAnimation.run(x, y, graphics, observer);
-                    break;
-                case 4:
-                    if(isHeadedRight == true)
-                        dieRightAnimation.run(x, y, graphics, observer);
-                    else
-                        dieLeftAnimation.run(x, y, graphics, observer);
-                    break;
-                default:
-                    break;
-            }*/
             
             if(isIdle){
                 if(isHeadedRight)
@@ -233,9 +208,14 @@ public class Player extends Character implements CharacterInterface{
             isLocked = false;
             firesIceBreath = false;
         }
-        graphics.drawRect(boundsBox.x, boundsBox.y, boundsBox.width, boundsBox.height);
-        graphics.drawRect(leftRangeBox.x, leftRangeBox.y, leftRangeBox.width, leftRangeBox.height);
-        graphics.drawRect(rightRangeBox.x, rightRangeBox.y, rightRangeBox.width, rightRangeBox.height);
+        //try{
+            graphics.drawRect(boundsBox.x, boundsBox.y, boundsBox.width, boundsBox.height);
+            graphics.drawRect(leftRangeBox.x, leftRangeBox.y, leftRangeBox.width, leftRangeBox.height);
+            graphics.drawRect(rightRangeBox.x, rightRangeBox.y, rightRangeBox.width, rightRangeBox.height);
+            //graphics.drawRect(x, y, 100, 100);
+        //}catch(NoSuchFieldError e){
+        //    System.out.println("drawRect boundBox error");
+        //}
     }
     
     @Override
@@ -245,11 +225,10 @@ public class Player extends Character implements CharacterInterface{
         updateBounds();
         checkArenaCollisions();
         updateAnimations();
-        //System.out.println("magicShieldOn: " + magicShieldOn);
+        System.out.println("boundsBox.x: " + boundsBox.x + " boundsBox.y: " + boundsBox.y);
         //System.out.println("shieldAbsorbsDamage: " + shieldAbsorbsDamage);
         
-        
-        
+
     }
     
     public void updateEnemysList(ArrayList<Enemy> enemysList){
@@ -422,7 +401,7 @@ public class Player extends Character implements CharacterInterface{
     
     private void generateFireball(){
         try{
-            fireballsList.add(new Fireball(x + 20, y + 50, 500, isHeadedRight, enemysList));
+            fireballsList.add(new Fireball(originX, originY, 500, isHeadedRight, enemysList));
         }
         catch(IOException e){
             System.out.println("Problem with fireball files!");
@@ -432,9 +411,9 @@ public class Player extends Character implements CharacterInterface{
     private void generateIceBreath(){
         try{
             if(isHeadedRight)
-                iceBreath = new IceBreath(x + 5, y + 40, 400, true, enemysList);
+                iceBreath = new IceBreath(x + characterWidth, originY, 400, true, enemysList);
             else
-                iceBreath = new IceBreath(x + 95 - 150, y + 40, 400, false, enemysList);
+                iceBreath = new IceBreath(x, originY, 400, false, enemysList);
         }
         catch(IOException e){
             System.out.println("Problem with iceBreath files!");

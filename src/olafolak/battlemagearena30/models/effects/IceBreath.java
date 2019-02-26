@@ -10,10 +10,13 @@ import java.awt.Rectangle;
 import java.io.IOException;
 import java.util.ArrayList;
 import olafolak.battlemagearena30.models.animations.Animation;
+import static olafolak.battlemagearena30.models.characters.Character.characterHeight;
+import static olafolak.battlemagearena30.models.characters.Character.characterWidth;
 import olafolak.battlemagearena30.models.characters.Enemy;
 import olafolak.battlemagearena30.models.exceptions.EndOfIceBreathException;
 import olafolak.battlemagearena30.models.exceptions.EndSingleAnimationException;
 import olafolak.battlemagearena30.models.game.Game;
+import olafolak.battlemagearena30.models.sprites.BoundsBox;
 
 /**
  *
@@ -23,20 +26,30 @@ public class IceBreath extends Effect{
     
     //Technical fields.
     private Animation breathAnimation;
-    private Rectangle freezeArea;
+    private BoundsBox freezeArea;
     
     private boolean frozeEnemys = false;
     
-    public IceBreath(int x, int y, int range, boolean rightDirection, ArrayList<Enemy> enemysList) throws IOException{
+    // Bounds.
+    private int breathWidth = (int)(1.5 * characterWidth);
+    private int breathHeight = (int)(0.6 * characterHeight);
+    private int freezeAreaWidth = (int)(1.0 * characterWidth);
+    private int freezeAreaHeight = (int)(0.8 * characterHeight);
+    
+    public IceBreath(int originX, int originY, int range, boolean rightDirection, ArrayList<Enemy> enemysList) throws IOException{
         
-        super(x, y, range, rightDirection, enemysList);
-        freezeArea = new Rectangle(x, y - 30, 150, 90);
+        super(originX, originY, range, rightDirection, enemysList);
+        this.x = originX - (breathWidth / 2);
+        this.y = originY - (breathHeight / 2);
+        
+        freezeArea = new BoundsBox(0, 0, freezeAreaWidth, freezeAreaHeight);
+        //freezeArea.setBounds(x, y, x, x);
         
         
         if(isHeadedRight == true)
-            breathAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/iceBreath", "iceBreath_right", 9, 150, 60), 1);
+            breathAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/iceBreath", "iceBreath_right", 9, breathWidth, breathHeight), 1);
         else
-            breathAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/iceBreath", "iceBreath_left", 9, 150, 60), 1);
+            breathAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/iceBreath", "iceBreath_left", 9, breathWidth, breathHeight), 1);
         
     }
     

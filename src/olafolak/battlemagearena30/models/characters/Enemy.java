@@ -20,6 +20,8 @@ import olafolak.battlemagearena30.models.effects.Fireball;
 import olafolak.battlemagearena30.models.exceptions.EnemyDiesException;
 import olafolak.battlemagearena30.models.exceptions.EndSingleAnimationException;
 import olafolak.battlemagearena30.models.game.Game;
+import static olafolak.battlemagearena30.models.game.Game.HEIGHT;
+import static olafolak.battlemagearena30.models.game.Game.WIDTH;
 import olafolak.battlemagearena30.models.sprites.BoundsBox;
 
 /**
@@ -44,28 +46,30 @@ public class Enemy extends Character implements CharacterInterface{
     private int attackTimer = 0;
     private Player player;
     
+    // Bounds.
+    public static int characterWidth = (int)(WIDTH * (100.0 / WIDTH));
+    public static int characterHeight = (int)(HEIGHT * (100.0 / HEIGHT));
     
     
     
-    
-    public Enemy(int x, int y, int width, int height, int speed, int health, Player player) throws IOException {
-        super(x, y, width, height, speed, health);
+    public Enemy(int x, int y, int speed, int health, Player player) throws IOException {
+        super(x, y, speed, health);
         
-        pathFinder = new PathFinder(this, player);
+        //pathFinder = new PathFinder(this, player);
         this.player = player;
         isHeadedRight = false;
         
-        idleRightAnimation = new Animation(60, 0.85, getAnimationFrames("src/res/sprites/w_warrior", "idle_right", 5, 100, 100), 0);
-        idleLeftAnimation = new Animation(60, 0.85, getAnimationFrames("src/res/sprites/w_warrior", "idle_left", 5, 100, 100), 0);
-        walkRightAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "walk_right", 5, 100, 100), 0);
-        walkLeftAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "walk_left", 5, 100, 100), 0);
-        attackRightAnimation = new Animation (60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "attack_right", 5, 100, 100), 1);
-        attackLeftAnimation = new Animation (60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "attack_left", 5, 100, 100), 1); 
-        hurtRightAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/sprites/w_warrior", "hurt_right", 5, 100, 100), 1);
-        hurtLeftAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/sprites/w_warrior", "hurt_left", 5, 100, 100), 1); 
-        bloodAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/blood", "blood", 6, 100, 100), 1);
-        dieRightAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "die_right", 5, 100, 100), 1);
-        dieLeftAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "die_left", 5, 100, 100), 1);
+        idleRightAnimation = new Animation(60, 0.85, getAnimationFrames("src/res/sprites/w_warrior", "idle_right", 5, characterWidth, characterHeight), 0);
+        idleLeftAnimation = new Animation(60, 0.85, getAnimationFrames("src/res/sprites/w_warrior", "idle_left", 5, characterWidth, characterHeight), 0);
+        walkRightAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "walk_right", 5, characterWidth, characterHeight), 0);
+        walkLeftAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "walk_left", 5, characterWidth, characterHeight), 0);
+        attackRightAnimation = new Animation (60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "attack_right", 5, characterWidth, characterHeight), 1);
+        attackLeftAnimation = new Animation (60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "attack_left", 5, characterWidth, characterHeight), 1); 
+        hurtRightAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/sprites/w_warrior", "hurt_right", 5, characterWidth, characterHeight), 1);
+        hurtLeftAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/sprites/w_warrior", "hurt_left", 5, characterWidth, characterHeight), 1); 
+        bloodAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/blood", "blood", 6, characterWidth, characterHeight), 1);
+        dieRightAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "die_right", 5, characterWidth, characterHeight), 1);
+        dieLeftAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "die_left", 5, characterWidth, characterHeight), 1);
         freezeAnimation = new Animation(60, 1, getAnimationFrames("src/res/effects/freeze", "freeze", 6, 100, 100), 1);
         frozenAnimation = new Animation(60, 5, getAnimationFrames("src/res/effects/freeze", "frozen", 1, 100, 100), 1);
         
@@ -157,14 +161,14 @@ public class Enemy extends Character implements CharacterInterface{
         graphics.drawRect(leftRangeBox.x, leftRangeBox.y, leftRangeBox.width, leftRangeBox.height);
         graphics.drawRect(rightRangeBox.x, rightRangeBox.y, rightRangeBox.width, rightRangeBox.height);
         graphics.setColor(Color.red);
-        graphics.fillRect(x, y - 10, health * 100 / maxHealth, 10);
+        graphics.fillRect(healthBar.x, healthBar.y, health * healthBarWidth / maxHealth, healthBarHeight);
         graphics.setColor(Color.black);
         
     }
     
     public void tick(Player player){
         
-        moveToPlayer(player);
+        //moveToPlayer(player);
         updateMovement();
         updateBounds(); 
         updateAnimations();

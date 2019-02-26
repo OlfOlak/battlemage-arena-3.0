@@ -11,9 +11,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import olafolak.battlemagearena30.models.animations.Animation;
 import olafolak.battlemagearena30.models.characters.Enemy;
+import static olafolak.battlemagearena30.models.characters.Character.*;
 import olafolak.battlemagearena30.models.exceptions.EndOfFireballException;
 import olafolak.battlemagearena30.models.exceptions.EndSingleAnimationException;
 import olafolak.battlemagearena30.models.game.Game;
+import olafolak.battlemagearena30.models.sprites.BoundsBox;
 
 /**
  *
@@ -28,44 +30,52 @@ public class Fireball extends Effect{
     private boolean flys = true;
     private boolean explodes = false;
     private boolean dealtDamage = false;
-    private Rectangle explosionArea;
-    private Rectangle projectileArea;
+    private BoundsBox explosionArea;
+    private BoundsBox projectileArea;
+    
+    // Bounds.
+    private int projectileWidth = (int)(0.6 * characterWidth);
+    private int projectileHeight = (int)(0.36 * characterHeight);
+    private int explosionWidth = (int)(3.0 * characterWidth);
+    private int explosionHeight = (int)(3.0 * characterHeight);
+    private int explosionAreaWidth = (int)(explosionWidth / 3);
+    private int explosionAreaHeight = (int)(explosionHeight / 3);
     
     
-    public Fireball(int x, int y, int range, boolean rightDirection, ArrayList<Enemy> enemysList) throws IOException{
+    public Fireball(int originX, int originY, int range, boolean rightDirection, ArrayList<Enemy> enemysList) throws IOException{
         
-        super(x, y, range, rightDirection, enemysList);
-        projectileArea = new Rectangle(x, y, 60, 36);
+        super(originX, originY, range, rightDirection, enemysList);
+        this.originX = originX;
+        this.originY = originY;
+        this.x = originX - (projectileWidth / 2);
+        this.y = originY - (projectileHeight / 2);
+        projectileArea = new BoundsBox(originX, originY, projectileWidth, projectileHeight);
         
         if(isHeadedRight == true)
-            flyAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/fireball", "projectile_right", 9, 60, 36), 0);
+            flyAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/fireball", "projectile_right", 9, projectileWidth, projectileHeight), 0);
         else
-            flyAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/fireball", "projectile_left", 9, 60, 36), 0);
+            flyAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/fireball", "projectile_left", 9, projectileWidth, projectileHeight), 0);
         
-        explosionAnimation = new Animation(60, 1, getAnimationFrames("src/res/effects/fireball", "explosion", 13, 300, 300), 1);
-        //smokeAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/fireball", "smoke", 13, 300, 300), 1);
-            
-        
+        explosionAnimation = new Animation(60, 1, getAnimationFrames("src/res/effects/fireball", "explosion", 13, explosionWidth, explosionHeight), 1);
+        //smokeAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/fireball", "smoke", 13, 300, 300), 1);    
     }
-    
-    
     
     public void draw(Graphics graphics, Game observer) throws EndOfFireballException{
         
         try{
             if(flys == true){
                 flyAnimation.run(x, y, graphics, observer);
-                graphics.drawRect(x, y, 60, 36);
+                graphics.drawRect(x, y, projectileWidth, projectileHeight);
             }
             else{ 
-                explosionArea = new Rectangle(x - 100 + 100, y - 130 + 100, 100, 100);
-                explosionAnimation.run(x - 100, y - 130, graphics, observer);
+                explosionArea = new BoundsBox(originX, originY, explosionAreaWidth, explosionAreaHeight);
+                explosionAnimation.run(originX - (explosionWidth / 2), originY - (explosionHeight / 2), graphics, observer);
                 if(!dealtDamage){
                     dealDamage();
                     dealtDamage = true;
                 }
 
-                graphics.drawRect(x - 100 + 100, y - 130 + 100, 100, 100);
+                graphics.drawRect(explosionArea.x, explosionArea.y, explosionArea.width, explosionArea.height);
                 System.out.println("x: " + x + " y: " + y);
                 //smokeAnimation.run(x, y, graphics, observer);
             }
@@ -73,8 +83,7 @@ public class Fireball extends Effect{
         catch(EndSingleAnimationException e){
             System.out.println("KAAABOOOOOOM!!!!!!!");
             explosionAnimation.reset();
-            throw new EndOfFireballException(this);
-            
+            throw new EndOfFireballException(this);    
         }
     }
     
@@ -107,10 +116,10 @@ public class Fireball extends Effect{
     
     private void updateBounds(){
         if(flys == true){
-            originX = x + 30;
-            originY = y + 18;
+            originX = x + (projectileWidth / 2);
+            originY = y + (projectileHeight / 2);
         }
-        projectileArea.setBounds(x, y, 60, 36);
+        projectileArea.setBounds(x, y, projectileWidth, projectileHeight);
         
     }
     

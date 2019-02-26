@@ -14,111 +14,29 @@ import olafolak.battlemagearena30.models.game.Game;
  *
  * @author OlafPC
  */
-public class BoundsBox {
+public class BoundsBox extends Rectangle{
     
-    private int posX;
-    private int posY;
-    private int width;
-    private int height;
-    private Dimension leftUpCorner;
-    private Dimension rightUpCorner;
-    private Dimension leftDownCorner;
-    private Dimension rightDownCorner;
-    
-    
-    public BoundsBox(int x, int y, int w, int h){
-        this.posX = x;
-        this.posY = y;
-        this.width = w;
-        this.height = w;
-        leftUpCorner = new Dimension(x - width / 2, y - height / 2);
-        rightUpCorner = new Dimension(x + width / 2, y - height / 2);
-        leftDownCorner = new Dimension(x - width / 2, y + height / 2);
-        rightDownCorner = new Dimension(x + width + 2, y + height / 2);
+    public int originX;
+    public int originY;
+
+    public BoundsBox(int originX, int originY, int w, int h){
+        super(originX - (w / 2), originY - (h / 2), w, h);
+        this.originX = originX;
+        this.originY = originY;
     }
-    
-    public boolean contains(double x, double y){
-        
-        if(x <= rightUpCorner.width 
-                && x >= leftUpCorner.width
-                && y >= leftUpCorner.height
-                && y <= leftDownCorner.height)
-            return true;
-        else
-            return false;
-    }
-    
+
     public void draw(Graphics graphics, Game observer){
-        graphics.drawRect(leftUpCorner.width, leftUpCorner.height, width, height);
+        graphics.drawRect(x, y, width, height);
         
     }
-
-    public int getPosX() {
-        return posX;
-    }
-
-    public void setPosX(int posX) {
-        this.posX = posX;
-    }
-
-    public int getPosY() {
-        return posY;
-    }
-
-    public void setPosY(int posY) {
-        this.posY = posY;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
+    
+    public void setBoundsByOrigin(int originX, int originY, int width, int height){
+        this.originX = originX;
+        this.originY = originY;
         this.width = width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
         this.height = height;
+        this.x = originX - (width / 2);
+        this.y = originY - (height / 2);
     }
 
-    public Dimension getLeftUpCorner() {
-        return leftUpCorner;
-    }
-
-    public void setLeftUpCorner(Dimension leftUpCorner) {
-        this.leftUpCorner = leftUpCorner;
-    }
-
-    public Dimension getRightUpCorner() {
-        return rightUpCorner;
-    }
-
-    public void setRightUpCorner(Dimension rightUpCorner) {
-        this.rightUpCorner = rightUpCorner;
-    }
-
-    public Dimension getLeftDownCorner() {
-        return leftDownCorner;
-    }
-
-    public void setLeftDownCorner(Dimension leftDownCorner) {
-        this.leftDownCorner = leftDownCorner;
-    }
-
-    public Dimension getRightDownCorner() {
-        return rightDownCorner;
-    }
-
-    public void setRightDownCorner(Dimension rightDownCorner) {
-        this.rightDownCorner = rightDownCorner;
-    }
-
-    
-    
-    
-    
 }
