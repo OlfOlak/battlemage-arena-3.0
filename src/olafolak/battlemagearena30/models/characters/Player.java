@@ -68,6 +68,9 @@ public class Player extends Character implements CharacterInterface{
     private int castFireballHeight = (int)(1.5 * characterHeight);
     private int castIceBreathWidth = (int)(1.5 * characterWidth);
     private int castIceBreathHeight = (int)(1.5 * characterHeight);
+    private int iceBreathRightPositionX = (int)(0.05 * characterWidth);
+    private int iceBreathLeftPositionX = (int)(0.95 * characterWidth);
+    private int iceBreathPositionY = (int)(0.4 * characterHeight);
     
     // Constructors.
     public Player(int x, int y, int speed, int health, int magicPower) throws IOException{
@@ -225,7 +228,7 @@ public class Player extends Character implements CharacterInterface{
         updateBounds();
         checkArenaCollisions();
         updateAnimations();
-        System.out.println("boundsBox.x: " + boundsBox.x + " boundsBox.y: " + boundsBox.y);
+        //System.out.println("boundsBox.x: " + boundsBox.x + " boundsBox.y: " + boundsBox.y);
         //System.out.println("shieldAbsorbsDamage: " + shieldAbsorbsDamage);
         
 
@@ -411,9 +414,9 @@ public class Player extends Character implements CharacterInterface{
     private void generateIceBreath(){
         try{
             if(isHeadedRight)
-                iceBreath = new IceBreath(x + characterWidth, originY, 400, true, enemysList);
+                iceBreath = new IceBreath(x + iceBreathRightPositionX, y + iceBreathPositionY, 400, true, enemysList);
             else
-                iceBreath = new IceBreath(x, originY, 400, false, enemysList);
+                iceBreath = new IceBreath(x + iceBreathLeftPositionX - (int)(1.5 * characterWidth), y + iceBreathPositionY, 400, false, enemysList);
         }
         catch(IOException e){
             System.out.println("Problem with iceBreath files!");

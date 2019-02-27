@@ -55,7 +55,7 @@ public class Enemy extends Character implements CharacterInterface{
     public Enemy(int x, int y, int speed, int health, Player player) throws IOException {
         super(x, y, speed, health);
         
-        //pathFinder = new PathFinder(this, player);
+        pathFinder = new PathFinder(this, player);
         this.player = player;
         isHeadedRight = false;
         
@@ -168,7 +168,7 @@ public class Enemy extends Character implements CharacterInterface{
     
     public void tick(Player player){
         
-        //moveToPlayer(player);
+        moveToPlayer(player);
         updateMovement();
         updateBounds(); 
         updateAnimations();
@@ -384,6 +384,120 @@ public class Enemy extends Character implements CharacterInterface{
     public void setTakesDamage(boolean takesDamage) {
         this.takesDamage = takesDamage;
     }
+
+    public Animation getBloodAnimation() {
+        return bloodAnimation;
+    }
+
+    public void setBloodAnimation(Animation bloodAnimation) {
+        this.bloodAnimation = bloodAnimation;
+    }
+
+    public Animation getDieRightAnimation() {
+        return dieRightAnimation;
+    }
+
+    public void setDieRightAnimation(Animation dieRightAnimation) {
+        this.dieRightAnimation = dieRightAnimation;
+    }
+
+    public Animation getDieLeftAnimation() {
+        return dieLeftAnimation;
+    }
+
+    public void setDieLeftAnimation(Animation dieLeftAnimation) {
+        this.dieLeftAnimation = dieLeftAnimation;
+    }
+
+    public Animation getFreezeAnimation() {
+        return freezeAnimation;
+    }
+
+    public void setFreezeAnimation(Animation freezeAnimation) {
+        this.freezeAnimation = freezeAnimation;
+    }
+
+    public Animation getFrozenAnimation() {
+        return frozenAnimation;
+    }
+
+    public void setFrozenAnimation(Animation frozenAnimation) {
+        this.frozenAnimation = frozenAnimation;
+    }
+
+    public boolean isPlayerInRange() {
+        return playerInRange;
+    }
+
+    public void setPlayerInRange(boolean playerInRange) {
+        this.playerInRange = playerInRange;
+    }
+
+    public boolean isCanAttack() {
+        return canAttack;
+    }
+
+    public void setCanAttack(boolean canAttack) {
+        this.canAttack = canAttack;
+    }
+
+    public boolean isIsFreezing() {
+        return isFreezing;
+    }
+
+    public void setIsFreezing(boolean isFreezing) {
+        this.isFreezing = isFreezing;
+    }
+
+    public boolean isIsFrozen() {
+        return isFrozen;
+    }
+
+    public void setIsFrozen(boolean isFrozen) {
+        this.isFrozen = isFrozen;
+    }
+
+    public PathFinder getPathFinder() {
+        return pathFinder;
+    }
+
+    public void setPathFinder(PathFinder pathFinder) {
+        this.pathFinder = pathFinder;
+    }
+
+    public int getAttackTimer() {
+        return attackTimer;
+    }
+
+    public void setAttackTimer(int attackTimer) {
+        this.attackTimer = attackTimer;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    public static int getCharacterWidth() {
+        return characterWidth;
+    }
+
+    public static void setCharacterWidth(int characterWidth) {
+        Enemy.characterWidth = characterWidth;
+    }
+
+    public static int getCharacterHeight() {
+        return characterHeight;
+    }
+
+    public static void setCharacterHeight(int characterHeight) {
+        Enemy.characterHeight = characterHeight;
+    }
+    
+    
     
     
     

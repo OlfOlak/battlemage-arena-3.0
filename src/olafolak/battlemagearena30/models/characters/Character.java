@@ -240,8 +240,7 @@ public abstract class Character implements CharacterInterface{
     }
 
     public void setMovesLeft(boolean movesLeft) {
-        if(!isLocked)
-            this.movesLeft = movesLeft;
+        this.movesLeft = movesLeft;
     }
 
     public boolean isMovesRight() {
@@ -249,8 +248,7 @@ public abstract class Character implements CharacterInterface{
     }
 
     public void setMovesRight(boolean movesRight) {
-        if(!isLocked)
-            this.movesRight = movesRight;
+        this.movesRight = movesRight;
     }
 
     public boolean isMovesUp() {
@@ -258,8 +256,7 @@ public abstract class Character implements CharacterInterface{
     }
 
     public void setMovesUp(boolean movesUp) {
-        if(!isLocked)
-            this.movesUp = movesUp;
+        this.movesUp = movesUp;
     }
 
     public boolean isMovesDown() {
@@ -267,8 +264,31 @@ public abstract class Character implements CharacterInterface{
     }
 
     public void setMovesDown(boolean movesDown) {
-        if(!isLocked)
-            this.movesDown = movesDown;
+        this.movesDown = movesDown;
+    }
+
+    public boolean isIsIdle() {
+        return isIdle;
+    }
+
+    public void setIsIdle(boolean isIdle) {
+        this.isIdle = isIdle;
+    }
+
+    public boolean isIsMoving() {
+        return isMoving;
+    }
+
+    public void setIsMoving(boolean isMoving) {
+        this.isMoving = isMoving;
+    }
+
+    public boolean isIsLocked() {
+        return isLocked;
+    }
+
+    public void setIsLocked(boolean isLocked) {
+        this.isLocked = isLocked;
     }
 
     public boolean isIsHeadedRight() {
@@ -367,10 +387,37 @@ public abstract class Character implements CharacterInterface{
         this.attackLeftAnimation = attackLeftAnimation;
     }
 
-    public Rectangle getHealthBar() {
+    public BoundsBox getBoundsBox() {
+        return boundsBox;
+    }
+
+    public void setBoundsBox(BoundsBox boundsBox) {
+        this.boundsBox = boundsBox;
+    }
+
+    public BoundsBox getLeftRangeBox() {
+        return leftRangeBox;
+    }
+
+    public void setLeftRangeBox(BoundsBox leftRangeBox) {
+        this.leftRangeBox = leftRangeBox;
+    }
+
+    public BoundsBox getRightRangeBox() {
+        return rightRangeBox;
+    }
+
+    public void setRightRangeBox(BoundsBox rightRangeBox) {
+        this.rightRangeBox = rightRangeBox;
+    }
+
+    public BoundsBox getHealthBar() {
         return healthBar;
     }
 
+    public void setHealthBar(BoundsBox healthBar) {
+        this.healthBar = healthBar;
+    }
 
     public Sprite getSprite() {
         return sprite;
@@ -396,6 +443,22 @@ public abstract class Character implements CharacterInterface{
         this.maxHealth = maxHealth;
     }
 
+    public static int getCharacterWidth() {
+        return characterWidth;
+    }
+
+    public static void setCharacterWidth(int characterWidth) {
+        Character.characterWidth = characterWidth;
+    }
+
+    public static int getCharacterHeight() {
+        return characterHeight;
+    }
+
+    public static void setCharacterHeight(int characterHeight) {
+        Character.characterHeight = characterHeight;
+    }
+
     public int getMeleeRangeX() {
         return meleeRangeX;
     }
@@ -412,69 +475,23 @@ public abstract class Character implements CharacterInterface{
         this.meleeRangeY = meleeRangeY;
     }
 
-    public boolean isIsIdle() {
-        return isIdle;
+    public int getHealthBarWidth() {
+        return healthBarWidth;
     }
 
-    public void setIsIdle(boolean isIdle) {
-        this.isIdle = isIdle;
+    public void setHealthBarWidth(int healthBarWidth) {
+        this.healthBarWidth = healthBarWidth;
     }
 
-    public boolean isIsMoving() {
-        return isMoving;
+    public int getHealthBarHeight() {
+        return healthBarHeight;
     }
 
-    public void setIsMoving(boolean isMoving) {
-        this.isMoving = isMoving;
+    public void setHealthBarHeight(int healthBarHeight) {
+        this.healthBarHeight = healthBarHeight;
     }
-
-    public boolean isIsLocked() {
-        return isLocked;
-    }
-
-    public void setIsLocked(boolean isLocked) {
-        this.isLocked = isLocked;
-    }
-
-    public BoundsBox getBoundsBox() {
-        return boundsBox;
-    }
-
-    public void setBoundsBox(BoundsBox boundsBox) {
-        this.boundsBox = boundsBox;
-    }
-
-    public BoundsBox getLeftRangeBox() {
-        return leftRangeBox;
-    }
-
-    public void setLeftRangeBox(BoundsBox leftRangeBox) {
-        this.leftRangeBox = leftRangeBox;
-    }
-
-    public BoundsBox getRightRangeBox() {
-        return rightRangeBox;
-    }
-
-    public void setRightRangeBox(BoundsBox rightRangeBox) {
-        this.rightRangeBox = rightRangeBox;
-    }
-
-    public int getCharacterWidth() {
-        return characterWidth;
-    }
-
-    public void setCharacterWidth(int characterWidth) {
-        this.characterWidth = characterWidth;
-    }
-
-    public int getCharacterHeight() {
-        return characterHeight;
-    }
-
-    public void setCharacterHeight(int characterHeight) {
-        this.characterHeight = characterHeight;
-    }
+    
+    
     
     
     

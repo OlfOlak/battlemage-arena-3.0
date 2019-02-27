@@ -86,43 +86,46 @@ public class PathFinder {
     }
     
     private void update(){
-        
-        // Player on the right.
-        if(player.getOriginX() - searcher.getOriginX() > 0){
-            // Player in X tunnel on the right.
-            if(player.getOriginY() < (searcher.getRightRangeBox().y + searcher.getRightRangeBox().height) 
-                    && player.getOriginY() > searcher.getRightRangeBox().y){
-                state = 2;
-            }  
-            // Player not in X tunnel.
-            else{
-                // Player in top right.
-                if(player.getOriginY() < searcher.getRightRangeBox().y){
-                    state = 4;
-                }
+        try{
+            // Player on the right.
+            if(player.getOriginX() - searcher.getOriginX() > 0){
+                // Player in X tunnel on the right.
+                if(player.getOriginY() < (searcher.getRightRangeBox().y + searcher.getRightRangeBox().height) 
+                        && player.getOriginY() > searcher.getRightRangeBox().y){
+                    state = 2;
+                }  
+                // Player not in X tunnel.
                 else{
-                    state = 6;
-                }
-            }  
-        }
-        // Player on the left.
-        else{
-            // Player in X tunnel on the left.
-            if(player.getOriginY() < (searcher.getRightRangeBox().y + searcher.getRightRangeBox().height) 
-                    && player.getOriginY() > searcher.getRightRangeBox().y){
-                state = 1;
-            }  
-            // Player not in X tunnel.
+                    // Player in top right.
+                    if(player.getOriginY() < searcher.getRightRangeBox().y){
+                        state = 4;
+                    }
+                    else{
+                        state = 6;
+                    }
+                }  
+            }
+            // Player on the left.
             else{
-                // Player in top left.
-                if(player.getOriginY() < searcher.getRightRangeBox().y){
-                    state = 3;
-                }
+                // Player in X tunnel on the left.
+                if(player.getOriginY() < (searcher.getRightRangeBox().y + searcher.getRightRangeBox().height) 
+                        && player.getOriginY() > searcher.getRightRangeBox().y){
+                    state = 1;
+                }  
+                // Player not in X tunnel.
                 else{
-                    state = 5;
+                    // Player in top left.
+                    if(player.getOriginY() < searcher.getRightRangeBox().y){
+                        state = 3;
+                    }
+                    else{
+                        state = 5;
+                    }
                 }
             }
-        } 
+        }catch(NoSuchMethodError e){
+            
+        }
     } 
     
     private void update(Enemy searcher, Player player){

@@ -19,9 +19,9 @@ public class GameController {
         
         game = new Game();
         
-        game.setPreferredSize(new Dimension((int)(game.WIDTH * game.SCALE), (int)(game.HEIGHT * game.SCALE)));
-        game.setMaximumSize(new Dimension((int)(game.WIDTH * game.SCALE), (int)(game.HEIGHT * game.SCALE)));
-        game.setMinimumSize(new Dimension((int)(game.WIDTH * game.SCALE), (int)(game.HEIGHT * game.SCALE)));
+        game.setPreferredSize(new Dimension((int)(game.WINDOW_WIDTH), (int)(game.WINDOW_HEIGHT)));
+        game.setMaximumSize(new Dimension((int)(game.WINDOW_WIDTH), (int)(game.WINDOW_HEIGHT)));
+        game.setMinimumSize(new Dimension((int)(game.WINDOW_WIDTH), (int)(game.WINDOW_HEIGHT)));
         
         JFrame frame = new JFrame(game.TITLE);
         frame.add(game);

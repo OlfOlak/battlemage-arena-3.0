@@ -36,27 +36,26 @@ public class IceBreath extends Effect{
     private int freezeAreaWidth = (int)(1.0 * characterWidth);
     private int freezeAreaHeight = (int)(0.8 * characterHeight);
     
-    public IceBreath(int originX, int originY, int range, boolean rightDirection, ArrayList<Enemy> enemysList) throws IOException{
+    public IceBreath(int x, int y, int range, boolean rightDirection, ArrayList<Enemy> enemysList) throws IOException{
         
-        super(originX, originY, range, rightDirection, enemysList);
-        this.x = originX - (breathWidth / 2);
-        this.y = originY - (breathHeight / 2);
-        
-        freezeArea = new BoundsBox(0, 0, freezeAreaWidth, freezeAreaHeight);
-        //freezeArea.setBounds(x, y, x, x);
-        
-        
-        if(isHeadedRight == true)
+        super(x, y, range, rightDirection, enemysList);
+
+        if(isHeadedRight == true){
             breathAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/iceBreath", "iceBreath_right", 9, breathWidth, breathHeight), 1);
-        else
+            freezeArea = new BoundsBox(x + (int)(0.95 * characterWidth), y + (int)(0.1 * characterHeight), freezeAreaWidth, freezeAreaHeight);
+        }
+        else{
             breathAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/iceBreath", "iceBreath_left", 9, breathWidth, breathHeight), 1);
+            freezeArea = new BoundsBox(x - (int)(0.95 * characterWidth) + (int)(1.5 * characterWidth) , y + (int)(0.1 * characterHeight), freezeAreaWidth, freezeAreaHeight);
+        }
         
     }
     
     public void draw(Graphics graphics, Game observer) throws EndOfIceBreathException{
         try{
             breathAnimation.run(x, y, graphics, observer);
-            graphics.drawRect(x, y - 30, 150, 90);
+            //graphics.drawRect(x, y - 30, 150, 90);
+            graphics.drawRect(freezeArea.x, freezeArea.y, freezeArea.width, freezeArea.height);
             if(!frozeEnemys){
                 freezeEnemys();
                 frozeEnemys = true;
