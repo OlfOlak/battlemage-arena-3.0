@@ -6,6 +6,7 @@
 package olafolak.battlemagearena30.models.exceptions;
 
 import olafolak.battlemagearena30.models.characters.Player;
+import olafolak.battlemagearena30.models.exceptions.CharacterDiesException;
 
 /**
  *

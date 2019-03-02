@@ -17,27 +17,41 @@ import olafolak.battlemagearena30.models.game.Game;
  */
 public class Animation {
     
-    private int fps;
-    private double length;
-    private int frames;
-    private int ticks = 0;
-    private int state = 0;
-    private int mode;
-    private ArrayList<BufferedImage> framesList;
+    protected int fps;
+    protected double length;
+    protected int frames;
+    protected int ticks = 0;
+    protected int state = 0;
+    protected int mode;
+    protected ArrayList<BufferedImage> framesList;
+    
+    protected int freezeTimer = 0;
+    protected int freezeTimerDuration;
+    protected boolean isFrozen;
     
     
     public Animation(int fps, double length, ArrayList<BufferedImage> inputFrames, int mode){
         this.fps = fps;
         this.length = length;
         this.framesList = inputFrames;
-        frames = framesList.size();
+        if(framesList != null)
+            frames = framesList.size();
         this.mode = mode;
         
     }
     
+    // Methods.
     public void run(double x, double y, Graphics graphics, Game observer) throws EndSingleAnimationException{
         
         double frameLength = length * fps / frames;
+        
+        if(freezeTimer != 0)
+            freezeTimer++;
+        
+        if(freezeTimer == freezeTimerDuration){
+            freezeTimer = 0;
+            isFrozen = false;
+        }
         
         if(ticks >= frameLength){
             
@@ -49,9 +63,10 @@ public class Animation {
                 }
                 
             }
-            else
-                state++;
-                
+            else{
+                if(!isFrozen)
+                    state++;
+            }    
             ticks = 0;
         }
 
@@ -66,6 +81,11 @@ public class Animation {
     
     public void incrementTicks(){
         ticks++;
+    }
+    
+    public void freeze(int duration){
+        freezeTimerDuration = 60 * duration;
+        isFrozen = true;
     }
     
     // Setters and getters.
@@ -116,9 +136,8 @@ public class Animation {
     public void setFramesList(ArrayList<Image> framesList) {
         this.framesList = framesList;
     }*/
-    
-    
-    
+
+
     
     
 }

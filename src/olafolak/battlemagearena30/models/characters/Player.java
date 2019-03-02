@@ -11,13 +11,14 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import olafolak.battlemagearena30.models.animations.Animation;
+import olafolak.battlemagearena30.models.animations.*;
 import olafolak.battlemagearena30.models.effects.Fireball;
 import olafolak.battlemagearena30.models.effects.IceBreath;
 import olafolak.battlemagearena30.models.exceptions.EndOfFireballException;
 import olafolak.battlemagearena30.models.exceptions.EndOfIceBreathException;
 import olafolak.battlemagearena30.models.exceptions.EndSingleAnimationException;
 import olafolak.battlemagearena30.models.exceptions.PlayerDiesException;
+import olafolak.battlemagearena30.models.exceptions.animationexceptions.*;
 import olafolak.battlemagearena30.models.game.Game;
 import static olafolak.battlemagearena30.models.game.Game.HEIGHT;
 import static olafolak.battlemagearena30.models.game.Game.WIDTH;
@@ -32,13 +33,20 @@ public class Player extends Character implements CharacterInterface{
     // Technical fields.
     private Animation hurtRightAnimation;
     private Animation hurtLeftAnimation;
-    private Animation bloodAnimation;
+    //private Animation bloodAnimation;
     private Animation dieRightAnimation;
     private Animation dieLeftAnimation;
     private Animation magicShieldAnimation;
     private Animation magicShieldAbsorbAnimation;
     private Animation castFireballAnimation;
     private Animation castIceBreathAnimation;
+    private IdleAnimation idleAnimation;
+    private WalkAnimation walkAnimation;
+    private AttackAnimation attackAnimation;
+    private GetHurtAnimation hurtAnimation;
+    private DieAnimation dieAnimation;
+    private BloodAnimation bloodAnimation;
+    
     private boolean magicShieldOn = false;
     private boolean shieldAbsorbsDamage = false;
     private boolean castsFireball = false;
@@ -80,17 +88,26 @@ public class Player extends Character implements CharacterInterface{
         fireballsList = new ArrayList<>();
         enemysList = new ArrayList<>();
         
-        idleRightAnimation = new Animation(60, 0.85, getAnimationFrames("src/res/sprites/elfmage", "idle_right", 5, characterWidth, characterHeight), 0);
-        idleLeftAnimation = new Animation(60, 0.85, getAnimationFrames("src/res/sprites/elfmage", "idle_left", 5, characterWidth, characterHeight), 0);
-        walkRightAnimation = new Animation(60, 0.2, getAnimationFrames("src/res/sprites/elfmage", "walk_right", 5, characterWidth, characterHeight), 0);
-        walkLeftAnimation = new Animation(60, 0.2, getAnimationFrames("src/res/sprites/elfmage", "walk_left", 5, characterWidth, characterHeight), 0);
-        attackRightAnimation = new Animation (60, 0.2, getAnimationFrames("src/res/sprites/elfmage", "attack_right", 5, characterWidth, characterHeight), 1);
-        attackLeftAnimation = new Animation (60, 0.2, getAnimationFrames("src/res/sprites/elfmage", "attack_left", 5, characterWidth, characterHeight), 1); 
-        hurtRightAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/sprites/elfmage", "hurt_right", 5, characterWidth, characterHeight), 1);
-        hurtLeftAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/sprites/elfmage", "hurt_left", 5, characterWidth, characterHeight), 1);
-        bloodAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/blood", "blood", 6, characterWidth, characterHeight), 1);
-        dieRightAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/elfmage", "die_right", 5, characterWidth, characterHeight), 1);
-        dieLeftAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/elfmage", "die_left", 5, characterWidth, characterHeight), 1);
+        
+        idleAnimation = new IdleAnimation(60, 0.85,
+                getAnimationFrames("src/res/sprites/elfmage", "idle_left", 5, characterWidth, characterHeight),
+                getAnimationFrames("src/res/sprites/elfmage", "idle_right", 5, characterWidth, characterHeight));
+        walkAnimation = new WalkAnimation(60, 0.2, 
+                getAnimationFrames("src/res/sprites/elfmage", "walk_left", 5, characterWidth, characterHeight),
+                getAnimationFrames("src/res/sprites/elfmage", "walk_right", 5, characterWidth, characterHeight));
+        
+        attackAnimation = new AttackAnimation(60, 0.2, 
+                getAnimationFrames("src/res/sprites/elfmage", "attack_left", 5, characterWidth, characterHeight),
+                getAnimationFrames("src/res/sprites/elfmage", "attack_right", 5, characterWidth, characterHeight));
+        hurtAnimation = new GetHurtAnimation(60, 0.5,
+                getAnimationFrames("src/res/sprites/elfmage", "hurt_left", 5, characterWidth, characterHeight),
+                getAnimationFrames("src/res/sprites/elfmage", "hurt_right", 5, characterWidth, characterHeight));
+        bloodAnimation = new BloodAnimation(60, 0.5, getAnimationFrames("src/res/effects/blood", "blood", 6, characterWidth, characterHeight), 1);
+        
+        dieAnimation = new DieAnimation(60, 0.7,
+                getAnimationFrames("src/res/sprites/elfmage", "die_left", 5, characterWidth, characterHeight),
+                getAnimationFrames("src/res/sprites/elfmage", "die_right", 5, characterWidth, characterHeight));
+        
         magicShieldAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/magicShield", "magicShield", 5, magicShieldWidth, magicShieldHeight), 0);
         magicShieldAbsorbAnimation = new Animation(60, 0.1, getAnimationFrames("src/res/effects/magicShield", "magicShield_absorb", 7, magicShieldAbsorbWidth, magicShieldAbsorbHeight), 1);
         castFireballAnimation = new Animation(60, 1, getAnimationFrames("src/res/effects/fireball", "cast", 11, castFireballWidth, castFireballHeight), 1);
@@ -103,39 +120,26 @@ public class Player extends Character implements CharacterInterface{
     public void draw(Graphics graphics, Game observer) throws PlayerDiesException{
         
         try{
-            
             if(isIdle){
-                if(isHeadedRight)
-                    idleRightAnimation.run(x, y, graphics, observer);
-                else
-                    idleLeftAnimation.run(x, y, graphics, observer);    
+                idleAnimation.updateDirection(isHeadedRight);
+                idleAnimation.run(x, y, graphics, observer);    
             }
             if(isMoving){
-                if(isHeadedRight)
-                    walkRightAnimation.run(x, y, graphics, observer);
-                else
-                    walkLeftAnimation.run(x, y, graphics, observer);
+                walkAnimation.updateDirection(isHeadedRight);
+                walkAnimation.run(x, y, graphics, observer);
             }
             if(isAttacking){
-                if(isHeadedRight)
-                    attackRightAnimation.run(x, y, graphics, observer);
-                else
-                    attackLeftAnimation.run(x, y, graphics, observer);
+                attackAnimation.updateDirection(isHeadedRight);
+                attackAnimation.run(x, y, graphics, observer);
             }
             if(takesDamage){
-                if(isHeadedRight){
-                    hurtRightAnimation.run(x, y, graphics, observer);
-                }
-                else{
-                    hurtLeftAnimation.run(x, y, graphics, observer);
-                }
+                hurtAnimation.updateDirection(isHeadedRight);
+                hurtAnimation.run(x, y, graphics, observer);
                 bloodAnimation.run(x, y, graphics, observer);
             }
             if(isDying){
-                if(isHeadedRight)
-                    dieRightAnimation.run(x, y, graphics, observer);
-                else
-                    dieLeftAnimation.run(x, y, graphics, observer);
+                dieAnimation.updateDirection(isHeadedRight);
+                dieAnimation.run(x, y, graphics, observer);
             }
             if(magicShieldOn)
                 magicShieldAnimation.run(originX - 213, originY - 206, graphics, observer);
@@ -167,26 +171,43 @@ public class Player extends Character implements CharacterInterface{
             if(firesIceBreath){
                 iceBreath.draw(graphics, observer);
             }
-            
+        }catch(EndOfDieException e){
+            dieAnimation.reset();
+            throw new PlayerDiesException(this);
+        }catch(EndOfGetHurtException e){
+            takesDamage = false;
+            hurtAnimation.reset();
+            bloodAnimation.reset();
+        }catch(EndOfAttackException e){
+            isAttacking = false;
+            attackAnimation.reset();
+        }catch(EndOfMagicShieldAbsorbException e){
+            shieldAbsorbsDamage = false;
+            magicShieldAbsorbAnimation.reset();
+        }catch(EndOfBloodException e){
+            bloodAnimation.reset();
+        }catch(EndOfCastFireballException e){
+            isLocked = false;
+            castsFireball = false;
+            throwsFireball = true;
+            generateFireball();
+        }catch(EndOfCastIceBreathException e){
+            castsIceBreath = false;
+            firesIceBreath = true;            
+        
         }catch(EndSingleAnimationException e){
-            if(isDying){
-                dieLeftAnimation.reset();
-                dieRightAnimation.reset();
+            /*if(isDying){
+                dieAnimation.reset();
                 throw new PlayerDiesException(this);
             }
             if(takesDamage){
                 takesDamage = false;
-                hurtRightAnimation.reset();
-                hurtLeftAnimation.reset();
-                bloodAnimation.reset();
-                hurtRightAnimation.reset();
-                hurtLeftAnimation.reset();
+                hurtAnimation.reset();
                 bloodAnimation.reset();
             }
             if(isAttacking){
                 isAttacking = false;
-                attackRightAnimation.reset();
-                attackLeftAnimation.reset();
+                attackAnimation.reset();
             }
             if(magicShieldOn){
                 shieldAbsorbsDamage = false;
@@ -201,7 +222,7 @@ public class Player extends Character implements CharacterInterface{
             if(castsIceBreath){
                 castsIceBreath = false;
                 firesIceBreath = true;    
-            }
+            }*/
         }catch(EndOfFireballException e){
             fireballsList.remove(e.getFireball());
             if(fireballsList.isEmpty())
@@ -241,55 +262,63 @@ public class Player extends Character implements CharacterInterface{
     protected void updateMovement(){
         
         if(!isDying){
-            if(!takesDamage){
-                if(!isAttacking){
+            if(!isLocked){
+                if(!takesDamage){
+                    if(!isAttacking){
 
-                    if(!movesLeft && !movesRight && !movesUp && !movesDown){
-                        animState = 0;
-                        isIdle = true;
-                        isMoving = false;
+                        if(!movesLeft && !movesRight && !movesUp && !movesDown){
+                            animState = 0;
+                            isIdle = true;
+                            isMoving = false;
+                        }
+                        else{
+                            isIdle = false;
+                            isMoving = true;
+                            if(movesLeft && canGoLeft){
+                                x -= speed;
+                                canGoRight = true;
+                                isHeadedRight = false;
+                                animState = 1;
+                            }
+                            if(movesRight && canGoRight){
+                                x += speed;
+                                canGoLeft = true;
+                                isHeadedRight = true;
+                                animState = 1;
+                            }
+                            if(movesUp && canGoUp){
+                                y -= speed;
+                                canGoDown = true;
+                                animState = 1;
+                            }
+                            if(movesDown && canGoDown){
+                                y += speed;
+                                canGoUp = true;
+                                animState = 1;
+                            }
+                        }
                     }
                     else{
+                        animState = 2;
                         isIdle = false;
-                        isMoving = true;
-                        if(movesLeft && canGoLeft){
-                            x -= speed;
-                            canGoRight = true;
-                            isHeadedRight = false;
-                            animState = 1;
-                        }
-                        if(movesRight && canGoRight){
-                            x += speed;
-                            canGoLeft = true;
-                            isHeadedRight = true;
-                            animState = 1;
-                        }
-                        if(movesUp && canGoUp){
-                            y -= speed;
-                            canGoDown = true;
-                            animState = 1;
-                        }
-                        if(movesDown && canGoDown){
-                            y += speed;
-                            canGoUp = true;
-                            animState = 1;
-                        }
+                        isMoving = false;
                     }
                 }
-                else{
-                    animState = 2;
-                    isIdle = false;
-                    isMoving = false;
-                }
-            }
             else{
                 animState = 3;
                 isAttacking = false;
+                isMoving = false;
+            }
+            }
+            else{
+                isAttacking = false;
                 isIdle = false;
                 isMoving = false;
+                takesDamage = false;
             }
         }
         else{
+            isLocked = false;
             isAttacking = false;
             takesDamage = false;
             isIdle = false;
@@ -301,17 +330,12 @@ public class Player extends Character implements CharacterInterface{
     
     private void updateAnimations(){
         
-        idleRightAnimation.incrementTicks();
-        idleLeftAnimation.incrementTicks();
-        walkRightAnimation.incrementTicks();
-        walkLeftAnimation.incrementTicks();
-        attackRightAnimation.incrementTicks();
-        attackLeftAnimation.incrementTicks();
-        hurtRightAnimation.incrementTicks();
-        hurtLeftAnimation.incrementTicks();
+        idleAnimation.incrementTicks();
+        walkAnimation.incrementTicks();
+        attackAnimation.incrementTicks();
+        hurtAnimation.incrementTicks();
         bloodAnimation.incrementTicks();
-        dieRightAnimation.incrementTicks();
-        dieLeftAnimation.incrementTicks();
+        dieAnimation.incrementTicks();
         magicShieldAnimation.incrementTicks();
         
         if(shieldAbsorbsDamage == true)

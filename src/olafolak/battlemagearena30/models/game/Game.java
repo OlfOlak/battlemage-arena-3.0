@@ -37,7 +37,7 @@ public class Game extends Canvas implements Runnable {
     private boolean running = false;
     private Thread thread;
     
-    private BufferedImage background = new BufferedImage((int)WIDTH, (int)HEIGHT, BufferedImage.TYPE_INT_RGB);
+    private BufferedImage background = new BufferedImage((int)WINDOW_WIDTH, (int)WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
     
     private Player player;
     private Enemy enemy;

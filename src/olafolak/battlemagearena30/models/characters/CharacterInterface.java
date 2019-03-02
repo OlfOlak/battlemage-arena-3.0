@@ -16,7 +16,7 @@ import olafolak.battlemagearena30.models.game.Game;
  */
 public interface CharacterInterface {
     
-    public void draw(Graphics graphics, Game observer) throws CharacterDiesException;
+    //public void draw(Graphics graphics, Game observer) throws CharacterDiesException;
     
     public void tick();
     

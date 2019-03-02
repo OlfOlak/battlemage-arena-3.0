@@ -49,6 +49,7 @@ public class Enemy extends Character implements CharacterInterface{
     // Bounds.
     public static int characterWidth = (int)(WIDTH * (100.0 / WIDTH));
     public static int characterHeight = (int)(HEIGHT * (100.0 / HEIGHT));
+    //private int freezeAnimationWidth = (int)()
     
     
     
@@ -78,7 +79,7 @@ public class Enemy extends Character implements CharacterInterface{
 
     @Override
     public void draw(Graphics graphics, Game observer) throws EnemyDiesException{
-        
+        // TODO: make separate animation and exception types. 
         try{
             
             if(isIdle){
@@ -115,46 +116,50 @@ public class Enemy extends Character implements CharacterInterface{
                     dieLeftAnimation.run(x, y, graphics, observer);
             }
             if(isFreezing){
+                if(isHeadedRight)
+                    idleRightAnimation.run(x, y, graphics, observer);
+                else
+                    idleLeftAnimation.run(x, y, graphics, observer);
                 freezeAnimation.run(x, y, graphics, observer);
             }
             if(isFrozen){
+                if(isHeadedRight)
+                    idleRightAnimation.run(x, y, graphics, observer);
+                else
+                    idleLeftAnimation.run(x, y, graphics, observer);
                 frozenAnimation.run(x, y, graphics, observer);
             }
      
         }catch(EndSingleAnimationException e){
 
             if(isDying){
-                dieLeftAnimation.setState(0);
-                dieRightAnimation.setState(0);
-                dieLeftAnimation.setTicks(0);
-                dieRightAnimation.setTicks(0);
+                dieLeftAnimation.reset();
+                dieRightAnimation.reset();
                 throw new EnemyDiesException(this);
             }
             if(takesDamage){
                 takesDamage = false;
-                hurtRightAnimation.setState(0);
-                hurtLeftAnimation.setState(0);
-                bloodAnimation.setState(0);
-                hurtRightAnimation.setTicks(0);
-                hurtLeftAnimation.setTicks(0);
-                bloodAnimation.setTicks(0);
+                hurtRightAnimation.reset();
+                hurtLeftAnimation.reset();
+                bloodAnimation.reset();
             }
             if(isAttacking){
                 player.takeDamage(10);
                 isAttacking = false;
-                attackRightAnimation.setState(0);
-                attackLeftAnimation.setState(0);
-                attackRightAnimation.setTicks(0);
-                attackLeftAnimation.setTicks(0);
-            }
-            if(isFreezing){
-                isFrozen = true;
-                isFreezing = false; 
+                attackRightAnimation.reset();
+                attackLeftAnimation.reset();
             }
             if(isFrozen){
                 isFrozen = false;
                 isLocked = false;
+                frozenAnimation.reset();
             }
+            if(isFreezing){
+                isFrozen = true;
+                isFreezing = false; 
+                freezeAnimation.reset();
+            }
+
                 
         }
         graphics.drawRect(boundsBox.x, boundsBox.y, boundsBox.width, boundsBox.height);
@@ -185,7 +190,8 @@ public class Enemy extends Character implements CharacterInterface{
     }
     
     protected void updateMovement(){
-        
+        if(!isFreezing){
+        if(!isFrozen){
         if(!isDying){
             if(!takesDamage){
                 if(!isAttacking){
@@ -243,6 +249,22 @@ public class Enemy extends Character implements CharacterInterface{
 
             animState = 4;
         }
+        }
+        else{
+            isDying = false;
+            isAttacking = false;
+            takesDamage = false;
+            isIdle = false;
+            isMoving = false;
+        }
+        }
+        else{
+            isDying = false;
+            isAttacking = false;
+            takesDamage = false;
+            isIdle = false;
+            isMoving = false;
+        }
     }
     
     private void updateAnimations(){
@@ -258,6 +280,8 @@ public class Enemy extends Character implements CharacterInterface{
         dieLeftAnimation.incrementTicks();
         attackRightAnimation.incrementTicks();
         attackLeftAnimation.incrementTicks();
+        freezeAnimation.incrementTicks();
+        frozenAnimation.incrementTicks();
         
     }
     
@@ -275,9 +299,9 @@ public class Enemy extends Character implements CharacterInterface{
     }
     
     public void freeze(){
-        isLocked = true;
+        //isLocked = true;
         stopMovement();
-        isFrozen = true;
+        isFreezing = true;
     }
 
     public void checkPlayerInRange(Player player){
