@@ -226,7 +226,7 @@ public class Game extends Canvas implements Runnable {
                 break;
             case KeyEvent.VK_SPACE:
                 //player.setIsAttacking(true);
-                player.attack(allEnemysList);
+                player.attack();
                 break;
             case KeyEvent.VK_1:
                 player.setupMagicShield();

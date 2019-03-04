@@ -17,6 +17,8 @@ import olafolak.battlemagearena30.models.game.Game;
  */
 public class MagicShieldAbsorbAnimation extends Animation{
     
+    
+    
     public MagicShieldAbsorbAnimation(int fps, double length, ArrayList<BufferedImage> inputFrames, int mode) {
         super(fps, length, inputFrames, mode);
     }

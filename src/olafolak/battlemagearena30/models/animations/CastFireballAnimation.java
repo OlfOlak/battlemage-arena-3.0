@@ -8,6 +8,8 @@ package olafolak.battlemagearena30.models.animations;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import static olafolak.battlemagearena30.models.characters.Player.characterHeight;
+import static olafolak.battlemagearena30.models.characters.Player.characterWidth;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfCastFireballException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfMagicShieldAbsorbException;
 import olafolak.battlemagearena30.models.game.Game;
@@ -16,12 +18,12 @@ import olafolak.battlemagearena30.models.game.Game;
  *
  * @author OlafPC
  */
-public class CastFireballAnimation extends Animation{
-    
+public class CastFireballAnimation extends DirectionalAnimation{
+
     public CastFireballAnimation(int fps, double length, ArrayList<BufferedImage> inputFrames, int mode) {
         super(fps, length, inputFrames, mode);
     }
-    
+
     public void run(double x, double y, Graphics graphics, Game observer) throws EndOfCastFireballException{
         
         double frameLength = length * fps / frames;
@@ -35,8 +37,12 @@ public class CastFireballAnimation extends Animation{
                 
             ticks = 0;
         }
-        
-        graphics.drawImage(framesList.get(state), (int)x, (int)y, observer);         
+        if(rightDirection){
+            graphics.drawImage(framesList.get(state), (int)(x + (0.2 * characterWidth) - (0.5 * 1.5 * characterWidth)), (int)(y + (0.7 * characterHeight) - (0.5 * 1.5 * characterHeight)), observer);
+        }
+        else{
+            graphics.drawImage(framesList.get(state), (int)(x + (0.8 * characterWidth) - (0.5 * 1.5 * characterWidth)), (int)(y + (0.7 * characterHeight) - (0.5 * 1.5 * characterHeight)), observer);  
+        }        
     }
     
 }

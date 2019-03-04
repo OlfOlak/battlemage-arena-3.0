@@ -31,15 +31,10 @@ import static olafolak.battlemagearena30.models.game.Game.WIDTH;
 public class Player extends Character implements CharacterInterface{
     
     // Technical fields.
-    private Animation hurtRightAnimation;
-    private Animation hurtLeftAnimation;
-    //private Animation bloodAnimation;
-    private Animation dieRightAnimation;
-    private Animation dieLeftAnimation;
     private Animation magicShieldAnimation;
-    private Animation magicShieldAbsorbAnimation;
-    private Animation castFireballAnimation;
-    private Animation castIceBreathAnimation;
+    private MagicShieldAbsorbAnimation magicShieldAbsorbAnimation;
+    private CastFireballAnimation castFireballAnimation;
+    private CastIceBreathAnimation castIceBreathAnimation;
     private IdleAnimation idleAnimation;
     private WalkAnimation walkAnimation;
     private AttackAnimation attackAnimation;
@@ -109,9 +104,9 @@ public class Player extends Character implements CharacterInterface{
                 getAnimationFrames("src/res/sprites/elfmage", "die_right", 5, characterWidth, characterHeight));
         
         magicShieldAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/magicShield", "magicShield", 5, magicShieldWidth, magicShieldHeight), 0);
-        magicShieldAbsorbAnimation = new Animation(60, 0.1, getAnimationFrames("src/res/effects/magicShield", "magicShield_absorb", 7, magicShieldAbsorbWidth, magicShieldAbsorbHeight), 1);
-        castFireballAnimation = new Animation(60, 1, getAnimationFrames("src/res/effects/fireball", "cast", 11, castFireballWidth, castFireballHeight), 1);
-        castIceBreathAnimation = new Animation(60, 1, getAnimationFrames("src/res/effects/iceBreath", "iceBreath_cast", 13, castIceBreathWidth, castIceBreathHeight), 1);
+        magicShieldAbsorbAnimation = new MagicShieldAbsorbAnimation(60, 0.1, getAnimationFrames("src/res/effects/magicShield", "magicShield_absorb", 7, magicShieldAbsorbWidth, magicShieldAbsorbHeight), 1);
+        castFireballAnimation = new CastFireballAnimation(60, 1, getAnimationFrames("src/res/effects/fireball", "cast", 11, castFireballWidth, castFireballHeight), 1);        
+        castIceBreathAnimation = new CastIceBreathAnimation(60, 1, getAnimationFrames("src/res/effects/iceBreath", "iceBreath_cast", 13, castIceBreathWidth, castIceBreathHeight), 1);
         
     }
     
@@ -142,25 +137,24 @@ public class Player extends Character implements CharacterInterface{
                 dieAnimation.run(x, y, graphics, observer);
             }
             if(magicShieldOn)
-                magicShieldAnimation.run(originX - 213, originY - 206, graphics, observer);
+                magicShieldAnimation.run(originX - (magicShieldWidth / 2), originY - (magicShieldHeight / 2), graphics, observer);
             
             if(shieldAbsorbsDamage)
-                magicShieldAbsorbAnimation.run(originX - 213, originY - 206, graphics, observer);
-            
+                magicShieldAbsorbAnimation.run(originX - (magicShieldAbsorbWidth / 2), originY - (magicShieldAbsorbHeight / 2), graphics, observer);
             
             if(castsFireball){
-                if(isHeadedRight)
-                    castFireballAnimation.run(x + 20 - 75, y + 70 - 75, graphics, observer);    
-                else
-                    castFireballAnimation.run(x + 80 - 75, y + 70 - 75, graphics, observer);  
+                idleAnimation.updateDirection(isHeadedRight);
+                castFireballAnimation.updateDirection(isHeadedRight);
+                idleAnimation.run(x, y, graphics, observer);
+                castFireballAnimation.run(x, y, graphics, observer);
             }
             
             if(castsIceBreath){
+                idleAnimation.updateDirection(isHeadedRight);
+                castIceBreathAnimation.updateDirection(isHeadedRight);
+                idleAnimation.run(x, y, graphics, observer);
+                castIceBreathAnimation.run(x, y, graphics, observer);
                 
-                if(isHeadedRight)
-                    castIceBreathAnimation.run(x + 20 - 75, y + 70 - 75, graphics, observer);    
-                else
-                    castIceBreathAnimation.run(x + 80 - 75, y + 70 - 75, graphics, observer);
             }
                     
             if(throwsFireball){
@@ -169,8 +163,11 @@ public class Player extends Character implements CharacterInterface{
             }
             
             if(firesIceBreath){
+                idleAnimation.updateDirection(isHeadedRight);
+                idleAnimation.run(x, y, graphics, observer);
                 iceBreath.draw(graphics, observer);
             }
+            
         }catch(EndOfDieException e){
             dieAnimation.reset();
             throw new PlayerDiesException(this);
@@ -179,6 +176,7 @@ public class Player extends Character implements CharacterInterface{
             hurtAnimation.reset();
             bloodAnimation.reset();
         }catch(EndOfAttackException e){
+            dealDamage();
             isAttacking = false;
             attackAnimation.reset();
         }catch(EndOfMagicShieldAbsorbException e){
@@ -193,36 +191,7 @@ public class Player extends Character implements CharacterInterface{
             generateFireball();
         }catch(EndOfCastIceBreathException e){
             castsIceBreath = false;
-            firesIceBreath = true;            
-        
-        }catch(EndSingleAnimationException e){
-            /*if(isDying){
-                dieAnimation.reset();
-                throw new PlayerDiesException(this);
-            }
-            if(takesDamage){
-                takesDamage = false;
-                hurtAnimation.reset();
-                bloodAnimation.reset();
-            }
-            if(isAttacking){
-                isAttacking = false;
-                attackAnimation.reset();
-            }
-            if(magicShieldOn){
-                shieldAbsorbsDamage = false;
-                magicShieldAbsorbAnimation.reset();
-            }
-            if(castsFireball){
-                isLocked = false;
-                castsFireball = false;
-                throwsFireball = true;
-                generateFireball();    
-            }
-            if(castsIceBreath){
-                castsIceBreath = false;
-                firesIceBreath = true;    
-            }*/
+            firesIceBreath = true;                
         }catch(EndOfFireballException e){
             fireballsList.remove(e.getFireball());
             if(fireballsList.isEmpty())
@@ -231,15 +200,15 @@ public class Player extends Character implements CharacterInterface{
             iceBreath = null;
             isLocked = false;
             firesIceBreath = false;
+        }catch(EndSingleAnimationException e){
+            
+            
+            
         }
-        //try{
-            graphics.drawRect(boundsBox.x, boundsBox.y, boundsBox.width, boundsBox.height);
-            graphics.drawRect(leftRangeBox.x, leftRangeBox.y, leftRangeBox.width, leftRangeBox.height);
-            graphics.drawRect(rightRangeBox.x, rightRangeBox.y, rightRangeBox.width, rightRangeBox.height);
-            //graphics.drawRect(x, y, 100, 100);
-        //}catch(NoSuchFieldError e){
-        //    System.out.println("drawRect boundBox error");
-        //}
+        graphics.drawRect(boundsBox.x, boundsBox.y, boundsBox.width, boundsBox.height);
+        graphics.drawRect(leftRangeBox.x, leftRangeBox.y, leftRangeBox.width, leftRangeBox.height);
+        graphics.drawRect(rightRangeBox.x, rightRangeBox.y, rightRangeBox.width, rightRangeBox.height);
+        
     }
     
     @Override
@@ -368,11 +337,14 @@ public class Player extends Character implements CharacterInterface{
         
     }
     
-    public void attack(ArrayList<Enemy> allEnemysList){
-        
+    public void attack(){
+        isAttacking = true;
+    }
+    
+    private void dealDamage(){
         try{
             ArrayList<Enemy> attackedList = new ArrayList<>();
-            attackedList = seekForCharactersInRange(allEnemysList);
+            attackedList = seekForCharactersInRange(enemysList);
 
             for(Enemy enemy : attackedList){
                 enemy.takeDamage(10);
@@ -380,11 +352,7 @@ public class Player extends Character implements CharacterInterface{
             }
         }catch(NullPointerException e){
             
-        }finally{
-            animState = 2;
-            isAttacking = true;
         }
-       
     }
     
     public void takeDamage(int damage){

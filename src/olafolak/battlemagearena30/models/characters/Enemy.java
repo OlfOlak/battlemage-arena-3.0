@@ -15,10 +15,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import olafolak.battlemagearena30.models.animations.Animation;
+import olafolak.battlemagearena30.models.animations.AttackAnimation;
+import olafolak.battlemagearena30.models.animations.BloodAnimation;
+import olafolak.battlemagearena30.models.animations.DieAnimation;
+import olafolak.battlemagearena30.models.animations.FreezeAnimation;
+import olafolak.battlemagearena30.models.animations.FrozenAnimation;
+import olafolak.battlemagearena30.models.animations.GetHurtAnimation;
+import olafolak.battlemagearena30.models.animations.IdleAnimation;
+import olafolak.battlemagearena30.models.animations.WalkAnimation;
 import static olafolak.battlemagearena30.models.characters.Player.scale;
 import olafolak.battlemagearena30.models.effects.Fireball;
 import olafolak.battlemagearena30.models.exceptions.EnemyDiesException;
 import olafolak.battlemagearena30.models.exceptions.EndSingleAnimationException;
+import olafolak.battlemagearena30.models.exceptions.PlayerDiesException;
+import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfAttackException;
+import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfBloodException;
+import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfDieException;
+import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfFreezeException;
+import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfFrozenException;
+import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfGetHurtException;
 import olafolak.battlemagearena30.models.game.Game;
 import static olafolak.battlemagearena30.models.game.Game.HEIGHT;
 import static olafolak.battlemagearena30.models.game.Game.WIDTH;
@@ -31,13 +46,11 @@ import olafolak.battlemagearena30.models.sprites.BoundsBox;
 public class Enemy extends Character implements CharacterInterface{
 
     // Technical fields.
-    private Animation hurtRightAnimation;
-    private Animation hurtLeftAnimation;
-    private Animation bloodAnimation;
-    private Animation dieRightAnimation;
-    private Animation dieLeftAnimation;
-    private Animation freezeAnimation;
-    private Animation frozenAnimation;
+    protected GetHurtAnimation hurtAnimation;
+    protected DieAnimation dieAnimation;
+    protected BloodAnimation bloodAnimation;
+    protected FreezeAnimation freezeAnimation;
+    protected FrozenAnimation frozenAnimation;
     private boolean playerInRange = false;
     private boolean canAttack = true;
     private boolean isFreezing = false;
@@ -49,7 +62,8 @@ public class Enemy extends Character implements CharacterInterface{
     // Bounds.
     public static int characterWidth = (int)(WIDTH * (100.0 / WIDTH));
     public static int characterHeight = (int)(HEIGHT * (100.0 / HEIGHT));
-    //private int freezeAnimationWidth = (int)()
+    private int freezeAnimationWidth = (int)(2.5 * characterWidth);
+    private int freezeAnimationHeight = (int)(2.5 * characterHeight);
     
     
     
@@ -59,20 +73,25 @@ public class Enemy extends Character implements CharacterInterface{
         pathFinder = new PathFinder(this, player);
         this.player = player;
         isHeadedRight = false;
+        idleAnimation = new IdleAnimation(60, 0.85,
+                getAnimationFrames("src/res/sprites/w_warrior", "idle_left", 5, characterWidth, characterHeight),
+                getAnimationFrames("src/res/sprites/w_warrior", "idle_right", 5, characterWidth, characterHeight));
+        walkAnimation = new WalkAnimation(60, 0.7, 
+                getAnimationFrames("src/res/sprites/w_warrior", "walk_left", 5, characterWidth, characterHeight),
+                getAnimationFrames("src/res/sprites/w_warrior", "walk_right", 5, characterWidth, characterHeight));
+        attackAnimation = new AttackAnimation(60, 0.7,
+                getAnimationFrames("src/res/sprites/w_warrior", "attack_left", 5, characterWidth, characterHeight),
+                getAnimationFrames("src/res/sprites/w_warrior", "attack_right", 5, characterWidth, characterHeight));
+        hurtAnimation = new GetHurtAnimation(60, 0.5,
+                getAnimationFrames("src/res/sprites/w_warrior", "hurt_left", 5, characterWidth, characterHeight),
+                getAnimationFrames("src/res/sprites/w_warrior", "hurt_right", 5, characterWidth, characterHeight));
+        dieAnimation = new DieAnimation(60, 0.7, 
+                getAnimationFrames("src/res/sprites/w_warrior", "die_left", 5, characterWidth, characterHeight),
+                getAnimationFrames("src/res/sprites/w_warrior", "die_right", 5, characterWidth, characterHeight));
+        bloodAnimation = new BloodAnimation(60, 0.5, getAnimationFrames("src/res/effects/blood", "blood", 6, characterWidth, characterHeight), 1);
         
-        idleRightAnimation = new Animation(60, 0.85, getAnimationFrames("src/res/sprites/w_warrior", "idle_right", 5, characterWidth, characterHeight), 0);
-        idleLeftAnimation = new Animation(60, 0.85, getAnimationFrames("src/res/sprites/w_warrior", "idle_left", 5, characterWidth, characterHeight), 0);
-        walkRightAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "walk_right", 5, characterWidth, characterHeight), 0);
-        walkLeftAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "walk_left", 5, characterWidth, characterHeight), 0);
-        attackRightAnimation = new Animation (60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "attack_right", 5, characterWidth, characterHeight), 1);
-        attackLeftAnimation = new Animation (60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "attack_left", 5, characterWidth, characterHeight), 1); 
-        hurtRightAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/sprites/w_warrior", "hurt_right", 5, characterWidth, characterHeight), 1);
-        hurtLeftAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/sprites/w_warrior", "hurt_left", 5, characterWidth, characterHeight), 1); 
-        bloodAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/blood", "blood", 6, characterWidth, characterHeight), 1);
-        dieRightAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "die_right", 5, characterWidth, characterHeight), 1);
-        dieLeftAnimation = new Animation(60, 0.7, getAnimationFrames("src/res/sprites/w_warrior", "die_left", 5, characterWidth, characterHeight), 1);
-        freezeAnimation = new Animation(60, 1, getAnimationFrames("src/res/effects/freeze", "freeze", 6, 100, 100), 1);
-        frozenAnimation = new Animation(60, 5, getAnimationFrames("src/res/effects/freeze", "frozen", 1, 100, 100), 1);
+        freezeAnimation = new FreezeAnimation(60, 2, getAnimationFrames("src/res/effects/freeze", "freeze", 6, freezeAnimationWidth, freezeAnimationHeight), 1);
+        frozenAnimation = new FrozenAnimation(60, 5, getAnimationFrames("src/res/effects/freeze", "frozen", 1, freezeAnimationWidth, freezeAnimationHeight), 1);
         
         
     }
@@ -81,86 +100,60 @@ public class Enemy extends Character implements CharacterInterface{
     public void draw(Graphics graphics, Game observer) throws EnemyDiesException{
         // TODO: make separate animation and exception types. 
         try{
-            
             if(isIdle){
-                if(isHeadedRight)
-                    idleRightAnimation.run(x, y, graphics, observer);
-                else
-                    idleLeftAnimation.run(x, y, graphics, observer);    
+                idleAnimation.updateDirection(isHeadedRight);
+                idleAnimation.run(x, y, graphics, observer);    
             }
             if(isMoving){
-                if(isHeadedRight)
-                    walkRightAnimation.run(x, y, graphics, observer);
-                else
-                    walkLeftAnimation.run(x, y, graphics, observer);
+                walkAnimation.updateDirection(isHeadedRight);
+                walkAnimation.run(x, y, graphics, observer);
             }
             if(isAttacking){
-                if(isHeadedRight)
-                    attackRightAnimation.run(x, y, graphics, observer);
-                else
-                    attackLeftAnimation.run(x, y, graphics, observer);
+                attackAnimation.updateDirection(isHeadedRight);
+                attackAnimation.run(x, y, graphics, observer);
             }
             if(takesDamage){
-                if(isHeadedRight){
-                    hurtRightAnimation.run(x, y, graphics, observer);
-                }
-                else{
-                    hurtLeftAnimation.run(x, y, graphics, observer);
-                }
+                hurtAnimation.updateDirection(isHeadedRight);
+                hurtAnimation.run(x, y, graphics, observer);
                 bloodAnimation.run(x, y, graphics, observer);
             }
             if(isDying){
-                if(isHeadedRight)
-                    dieRightAnimation.run(x, y, graphics, observer);
-                else
-                    dieLeftAnimation.run(x, y, graphics, observer);
+                dieAnimation.updateDirection(isHeadedRight);
+                dieAnimation.run(x, y, graphics, observer);
             }
             if(isFreezing){
-                if(isHeadedRight)
-                    idleRightAnimation.run(x, y, graphics, observer);
-                else
-                    idleLeftAnimation.run(x, y, graphics, observer);
+                idleAnimation.updateDirection(isHeadedRight);
+                idleAnimation.run(x, y, graphics, observer);
+                idleAnimation.freeze(2);
                 freezeAnimation.run(x, y, graphics, observer);
             }
-            if(isFrozen){
-                if(isHeadedRight)
-                    idleRightAnimation.run(x, y, graphics, observer);
-                else
-                    idleLeftAnimation.run(x, y, graphics, observer);
+            else if(isFrozen){
+                idleAnimation.updateDirection(isHeadedRight);
+                idleAnimation.run(x, y, graphics, observer);
                 frozenAnimation.run(x, y, graphics, observer);
+                //System.out.println("Is frozen!");
             }
-     
-        }catch(EndSingleAnimationException e){
-
-            if(isDying){
-                dieLeftAnimation.reset();
-                dieRightAnimation.reset();
-                throw new EnemyDiesException(this);
-            }
-            if(takesDamage){
-                takesDamage = false;
-                hurtRightAnimation.reset();
-                hurtLeftAnimation.reset();
-                bloodAnimation.reset();
-            }
-            if(isAttacking){
-                player.takeDamage(10);
-                isAttacking = false;
-                attackRightAnimation.reset();
-                attackLeftAnimation.reset();
-            }
-            if(isFrozen){
-                isFrozen = false;
-                isLocked = false;
-                frozenAnimation.reset();
-            }
-            if(isFreezing){
-                isFrozen = true;
-                isFreezing = false; 
-                freezeAnimation.reset();
-            }
-
-                
+        }catch(EndOfDieException e){
+            dieAnimation.reset();
+            throw new EnemyDiesException(this);
+        }catch(EndOfGetHurtException e){
+            takesDamage = false;
+            hurtAnimation.reset();
+            bloodAnimation.reset();
+        }catch(EndOfAttackException e){
+            isAttacking = false;
+            attackAnimation.reset(); 
+        }catch(EndOfBloodException e){
+            bloodAnimation.reset();
+        }catch(EndOfFreezeException e){
+            isFrozen = true;
+            isFreezing = false; 
+            freezeAnimation.reset();
+        }catch(EndOfFrozenException e){
+            isFrozen = false;
+            isLocked = false;
+            frozenAnimation.reset();
+            System.out.println("End of frozen!");
         }
         graphics.drawRect(boundsBox.x, boundsBox.y, boundsBox.width, boundsBox.height);
         graphics.drawRect(leftRangeBox.x, leftRangeBox.y, leftRangeBox.width, leftRangeBox.height);
@@ -190,54 +183,59 @@ public class Enemy extends Character implements CharacterInterface{
     }
     
     protected void updateMovement(){
-        if(!isFreezing){
-        if(!isFrozen){
+        
         if(!isDying){
-            if(!takesDamage){
-                if(!isAttacking){
+            if(!isLocked){
+                if(!takesDamage){
+                    if(!isAttacking){
 
-                    if(!movesLeft && !movesRight && !movesUp && !movesDown){
-                        animState = 0;
-                        isIdle = true;
-                        isMoving = false;
+                        if(!movesLeft && !movesRight && !movesUp && !movesDown){
+                            animState = 0;
+                            isIdle = true;
+                            isMoving = false;
+                        }
+                        else{
+                            isIdle = false;
+                            isMoving = true;
+                            if(movesLeft && canGoLeft){
+                                x -= speed;
+                                canGoRight = true;
+                                isHeadedRight = false;
+                                animState = 1;
+                            }
+                            if(movesRight && canGoRight){
+                                x += speed;
+                                canGoLeft = true;
+                                isHeadedRight = true;
+                                animState = 1;
+                            }
+                            if(movesUp && canGoUp){
+                                y -= speed;
+                                canGoDown = true;
+                                animState = 1;
+                            }
+                            if(movesDown && canGoDown){
+                                y += speed;
+                                canGoUp = true;
+                                animState = 1;
+                            }
+                        }
                     }
                     else{
+                        animState = 2;
                         isIdle = false;
-                        isMoving = true;
-                        if(movesLeft && canGoLeft){
-                            x -= speed;
-                            canGoRight = true;
-                            isHeadedRight = false;
-                            animState = 1;
-                        }
-                        if(movesRight && canGoRight){
-                            x += speed;
-                            canGoLeft = true;
-                            isHeadedRight = true;
-                            animState = 1;
-                        }
-                        if(movesUp && canGoUp){
-                            y -= speed;
-                            canGoDown = true;
-                            animState = 1;
-                        }
-                        if(movesDown && canGoDown){
-                            y += speed;
-                            canGoUp = true;
-                            animState = 1;
-                        }
+                        isMoving = false;
                     }
                 }
                 else{
-                    animState = 2;
+                    animState = 3;
+                    isAttacking = false;
                     isIdle = false;
                     isMoving = false;
                 }
             }
             else{
-                animState = 3;
                 isAttacking = false;
-                isIdle = false;
                 isMoving = false;
             }
         }
@@ -249,39 +247,26 @@ public class Enemy extends Character implements CharacterInterface{
 
             animState = 4;
         }
-        }
-        else{
-            isDying = false;
-            isAttacking = false;
-            takesDamage = false;
-            isIdle = false;
-            isMoving = false;
-        }
-        }
-        else{
-            isDying = false;
-            isAttacking = false;
-            takesDamage = false;
-            isIdle = false;
-            isMoving = false;
-        }
     }
     
     private void updateAnimations(){
         
-        idleRightAnimation.incrementTicks();
-        idleLeftAnimation.incrementTicks();
-        walkRightAnimation.incrementTicks();
-        walkLeftAnimation.incrementTicks();
+        idleAnimation.incrementTicks();
+        walkAnimation.incrementTicks();
         bloodAnimation.incrementTicks();
-        hurtRightAnimation.incrementTicks();
-        hurtLeftAnimation.incrementTicks();
-        dieRightAnimation.incrementTicks();
-        dieLeftAnimation.incrementTicks();
-        attackRightAnimation.incrementTicks();
-        attackLeftAnimation.incrementTicks();
-        freezeAnimation.incrementTicks();
-        frozenAnimation.incrementTicks();
+        hurtAnimation.incrementTicks();
+        dieAnimation.incrementTicks();
+        attackAnimation.incrementTicks();
+        
+        if(isFreezing)
+            freezeAnimation.incrementTicks();
+        else
+            freezeAnimation.reset();
+        
+        if(isFrozen)
+            frozenAnimation.incrementTicks();
+        else
+            frozenAnimation.reset();
         
     }
     
@@ -299,8 +284,8 @@ public class Enemy extends Character implements CharacterInterface{
     }
     
     public void freeze(){
-        //isLocked = true;
         stopMovement();
+        isLocked = true;
         isFreezing = true;
     }
 
@@ -385,69 +370,11 @@ public class Enemy extends Character implements CharacterInterface{
         this.attackLeftAnimation = attackLeftAnimation;
     }
 
-    public Animation getHurtRightAnimation() {
-        return hurtRightAnimation;
-    }
-
-    public void setHurtRightAnimation(Animation hurtRightAnimation) {
-        this.hurtRightAnimation = hurtRightAnimation;
-    }
-
-    public Animation getHurtLeftAnimation() {
-        return hurtLeftAnimation;
-    }
-
-    public void setHurtLeftAnimation(Animation hurtLeftAnimation) {
-        this.hurtLeftAnimation = hurtLeftAnimation;
-    }
-
-    public boolean isTakesDamage() {
-        return takesDamage;
-    }
-
-    public void setTakesDamage(boolean takesDamage) {
-        this.takesDamage = takesDamage;
-    }
-
-    public Animation getBloodAnimation() {
-        return bloodAnimation;
-    }
-
-    public void setBloodAnimation(Animation bloodAnimation) {
-        this.bloodAnimation = bloodAnimation;
-    }
-
-    public Animation getDieRightAnimation() {
-        return dieRightAnimation;
-    }
-
-    public void setDieRightAnimation(Animation dieRightAnimation) {
-        this.dieRightAnimation = dieRightAnimation;
-    }
-
-    public Animation getDieLeftAnimation() {
-        return dieLeftAnimation;
-    }
-
-    public void setDieLeftAnimation(Animation dieLeftAnimation) {
-        this.dieLeftAnimation = dieLeftAnimation;
-    }
 
     public Animation getFreezeAnimation() {
         return freezeAnimation;
     }
 
-    public void setFreezeAnimation(Animation freezeAnimation) {
-        this.freezeAnimation = freezeAnimation;
-    }
-
-    public Animation getFrozenAnimation() {
-        return frozenAnimation;
-    }
-
-    public void setFrozenAnimation(Animation frozenAnimation) {
-        this.frozenAnimation = frozenAnimation;
-    }
 
     public boolean isPlayerInRange() {
         return playerInRange;
