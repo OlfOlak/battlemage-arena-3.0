@@ -7,16 +7,22 @@ package olafolak.battlemagearena30.models.game;
 
 import java.awt.Canvas;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.ArrayList;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javax.imageio.ImageIO;
 import olafolak.battlemagearena30.models.characters.Enemy;
 import olafolak.battlemagearena30.models.utilities.KeyControl;
 import olafolak.battlemagearena30.models.characters.Player;
 import olafolak.battlemagearena30.models.exceptions.EnemyDiesException;
 import olafolak.battlemagearena30.models.exceptions.PlayerDiesException;
+import olafolak.battlemagearena30.models.utilities.AudioPlayer;
 import olafolak.battlemagearena30.models.world.Arena;
 
 
@@ -45,6 +51,8 @@ public class Game extends Canvas implements Runnable {
     
     private Graphics graphics;
     
+    private AudioPlayer bgMusic;
+    
     public ArrayList<Enemy> allEnemysList;
     
     
@@ -54,15 +62,20 @@ public class Game extends Canvas implements Runnable {
         try{
             allEnemysList = new ArrayList<>();
             player = new Player(100, 100, 7, 10000, 100);
-            enemy = new Enemy(400, 600, 1, 150, player);
-            allEnemysList.add(enemy);
+            //enemy = new Enemy(400, 600, 1, 150, player);
+            //allEnemysList.add(enemy);
             //enemy = new Enemy(500, 300, 0, 100, player);
             //allEnemysList.add(enemy);
             //enemy = new Enemy(700, 300, 1, 100, player);
             //allEnemysList.add(enemy);
             arena = new Arena((WINDOW_WIDTH), (WINDOW_HEIGHT));
+            background = ImageIO.read(new File("src/res/world/arenaTiles/bg.png"));
+            background = scale(background, 1280, 768);
             
-
+            // "src/res/sounds/music/bgMusic1.mp3"
+            Media hit = new Media(getClass().getResource("src/res/sounds/music/bgMusic1.mp3").toExternalForm());
+            MediaPlayer mediaPlayer = new MediaPlayer(hit);
+            mediaPlayer.play();
         } catch(IOException e){
             e.printStackTrace();
         }
@@ -187,45 +200,20 @@ public class Game extends Canvas implements Runnable {
     public void keyPressed(KeyEvent e){
         int key = e.getKeyCode();
         
-        /*if(key == KeyEvent.VK_LEFT)
-            player.moveLeft();
-        else if(key == KeyEvent.VK_RIGHT)
-            player.moveRight();
-        else if(key == KeyEvent.VK_UP)
-            player.moveUp();
-        else if(key == KeyEvent.VK_DOWN)
-            player.moveDown();
-        else if(key == KeyEvent.VK_LEFT && key == KeyEvent.VK_UP)
-            player.moveLeftUp();
-        else if(key == KeyEvent.VK_LEFT && key == KeyEvent.VK_DOWN)
-            player.moveLeftDown();
-        else if(key == KeyEvent.VK_RIGHT && key == KeyEvent.VK_UP)
-            player.moveRightUp();
-        else if(key == KeyEvent.VK_RIGHT && key == KeyEvent.VK_DOWN)
-            player.moveRightDown();*/
-        
-        
         switch(key){
             case KeyEvent.VK_LEFT:
-                //player.setInMotionX('-');
                 player.setMovesLeft(true);
                 break;
             case KeyEvent.VK_RIGHT:
-                //player.setInMotionX('+');
                 player.setMovesRight(true);
                 break;
             case KeyEvent.VK_UP:
                 player.setMovesUp(true);
-                //player.setInMotionY('-');
-                //player.moveUp();
                 break;
             case KeyEvent.VK_DOWN:
                 player.setMovesDown(true);
-                //player.setInMotionY('+');
-                //player.moveDown();
                 break;
             case KeyEvent.VK_SPACE:
-                //player.setIsAttacking(true);
                 player.attack();
                 break;
             case KeyEvent.VK_1:
@@ -248,28 +236,30 @@ public class Game extends Canvas implements Runnable {
         switch(key){
             case KeyEvent.VK_LEFT:
                 player.setMovesLeft(false);
-                //player.setVelX(0);
-                
-                //player.goIdle();
                 break;
             case KeyEvent.VK_RIGHT:
                 player.setMovesRight(false);
-                //player.setVelX(0);
-                //player.goIdle();
                 break;
             case KeyEvent.VK_UP:
                 player.setMovesUp(false);
-                //player.setVelY(0);
-                //player.goIdle();
                 break;
             case KeyEvent.VK_DOWN:
                 player.setMovesDown(false);
-                //player.setVelY(0);
-                //player.goIdle();
                 break;
             default:
                 break;
         }
+    }
+    
+    private static BufferedImage scale(BufferedImage imageToScale, int dWidth, int dHeight) {
+        BufferedImage scaledImage = null;
+        if (imageToScale != null) {
+            scaledImage = new BufferedImage(dWidth, dHeight, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D graphics2D = scaledImage.createGraphics();
+            graphics2D.drawImage(imageToScale, 0, 0, dWidth, dHeight, null);
+            graphics2D.dispose();
+        }
+        return scaledImage;
     }
 
     public boolean isRunning() {

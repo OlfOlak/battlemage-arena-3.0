@@ -60,8 +60,8 @@ public class Enemy extends Character implements CharacterInterface{
     private Player player;
     
     // Bounds.
-    public static int characterWidth = (int)(WIDTH * (100.0 / WIDTH));
-    public static int characterHeight = (int)(HEIGHT * (100.0 / HEIGHT));
+    public static int characterWidth = Character.characterWidth;//(int)(WIDTH * (100.0 / WIDTH));
+    public static int characterHeight = Character.characterHeight;//(int)(HEIGHT * (100.0 / HEIGHT));
     private int freezeAnimationWidth = (int)(2.5 * characterWidth);
     private int freezeAnimationHeight = (int)(2.5 * characterHeight);
     

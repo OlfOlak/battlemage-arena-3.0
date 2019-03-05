@@ -6,12 +6,13 @@
 package olafolak.battlemagearena30.models.world;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
-import olafolak.battlemagearena30.controllers.GameController;
 import olafolak.battlemagearena30.models.game.Game;
 import olafolak.battlemagearena30.models.sprites.BoundsBox;
 
@@ -23,9 +24,10 @@ public class Arena {
     
     private double width;
     private double height;
-    private int tilesW = 5;
-    private int tilesH = 3;
-    private ArrayList<ArrayList<Image>> tilesList;
+    private int tilesW = 20;
+    private int tilesH = 12;
+    private ArrayList<ArrayList<BufferedImage>> tilesList;
+    private BufferedImage background;
     public static BoundsBox movementArea;
     
     public Arena(double w, double h){
@@ -38,9 +40,12 @@ public class Arena {
         System.out.println("tileH: " + tilesH);
         tilesList = new ArrayList<>();
         
+        
         //for(int i = 0; i < tilesH; i++)
         //   tilesList.add(new ArrayList<>());
         try{
+            background = ImageIO.read(new File("src/res/world/backgrounds/arenaBackground_3.png"));
+            background = scale(background, 1340, 300);
             generateArena();
         } catch(IOException e){
             System.out.println("Problem in arena generation.");
@@ -48,85 +53,216 @@ public class Arena {
         
     }
     
+    private static BufferedImage scale(BufferedImage imageToScale, int dWidth, int dHeight) {
+        BufferedImage scaledImage = null;
+        if (imageToScale != null) {
+            scaledImage = new BufferedImage(dWidth, dHeight, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D graphics2D = scaledImage.createGraphics();
+            graphics2D.drawImage(imageToScale, 0, 0, dWidth, dHeight, null);
+            graphics2D.dispose();
+        }
+        return scaledImage;
+    }
+    
     private void generateArena() throws IOException{
 
         
-        Image tmp;
-        ArrayList<Image> tmpArray = new ArrayList<>();
+        BufferedImage tmp;
+        ArrayList<BufferedImage> tmpArray = new ArrayList<>();
         
-        for (int i = 0; i < tilesH - 1; ++i){
-            for(int j = 0; j < tilesW - 1; ++j){
+        for (int i = 0; i < 11; ++i){
+            for(int j = 0; j < 21; ++j){
                 
                 switch(i){
                     case 0:
                         switch(j){
                             case 0:
                                 tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_1.png"));
+                                tmp = scale(tmp, 64, 64);
+                                tmpArray.add(tmp);
+                                break;
+                            case 19:
+                                tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_3.png"));
+                                tmp = scale(tmp, 64, 64);
+                                tmpArray.add(tmp);
+                                break;
+                            case 20:
+                                tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_17_right.png"));
+                                tmp = scale(tmp, 64, 64);
                                 tmpArray.add(tmp);
                                 break;
                             default:
                                 tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_2.png"));
+                                tmp = scale(tmp, 64, 64);
                                 tmpArray.add(tmp);
                                 break;    
+                        }
+                        break;
+                    case 3:
+                        switch(j){
+                            case 0:
+                                tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_15.png"));
+                                tmp = scale(tmp, 64, 64);
+                                tmpArray.add(tmp);
+                                break;
+                            case 19:
+                                tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_7.png"));
+                                tmp = scale(tmp, 64, 64);
+                                tmpArray.add(tmp);
+                                break;
+                            case 20:
+                                tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_8.png"));
+                                tmp = scale(tmp, 64, 64);
+                                tmpArray.add(tmp);
+                                break;
+                            default:
+                                tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_6.png"));
+                                tmp = scale(tmp, 64, 64);
+                                tmpArray.add(tmp);
+                                break;
+                        }
+                        break;
+                    case 9:
+                        switch(j){
+                            case 0:
+                                tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_9.png"));
+                                tmp = scale(tmp, 64, 64);
+                                tmpArray.add(tmp);
+                                break;
+                            case 5:
+                                tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_10.png"));
+                                tmp = scale(tmp, 64, 64);
+                                tmpArray.add(tmp);
+                                break;
+                            case 19:
+                                tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_11.png"));
+                                tmp = scale(tmp, 64, 64);
+                                tmpArray.add(tmp);
+                                break;
+                            case 20:
+                                tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_17_right.png"));
+                                tmp = scale(tmp, 64, 64);
+                                tmpArray.add(tmp);
+                                break;
+                            default:
+                                tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_18.png"));
+                                tmp = scale(tmp, 64, 64);
+                                tmpArray.add(tmp);
+                                break;
+                        }
+                        break;
+                    case 10:
+                        switch(j){
+                            case 5:
+                                tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_13.png"));
+                                tmp = scale(tmp, 64, 64);
+                                tmpArray.add(tmp);
+                                break;
+                            case 20:
+                                tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_17_right.png"));
+                                tmp = scale(tmp, 64, 64);
+                                tmpArray.add(tmp);
+                                break;
+                            default:
+                                tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_17.png"));
+                                tmp = scale(tmp, 64, 64);
+                                tmpArray.add(tmp);
+                                break;
                         }
                         break;
                     default:
                         switch(j){
                             case 0:
                                 tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_15.png"));
+                                tmp = scale(tmp, 64, 64);
+                                tmpArray.add(tmp);
+                                break;
+                            case 19:
+                                tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_16.png"));
+                                tmp = scale(tmp, 64, 64);
+                                tmpArray.add(tmp);
+                                break;
+                            case 20:
+                                tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_17_right.png"));
+                                tmp = scale(tmp, 64, 64);
                                 tmpArray.add(tmp);
                                 break;
                             default:
                                 tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_6.png"));
+                                tmp = scale(tmp, 64, 64);
                                 tmpArray.add(tmp);
                                 break;    
                         }
                         break;       
                 }  
             }
+            tilesList.add(tmpArray);
+            tmpArray = new ArrayList<>();
             
-            if(i == 0){
+            /*if(i == 0){
                 tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_3.png"));
+                tmp = scale(tmp, 64, 64);
                 tmpArray.add(tmp);
                 tilesList.add(tmpArray);
                 tmpArray = new ArrayList<>();
                 System.out.println("Size of tilesList: " + tilesList.size());
+            }
+            else if(i == 5){
+                tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_8.png"));
+                tmp = scale(tmp, 64, 64);
+                tmpArray.add(tmp);
+                tilesList.add(tmpArray);
+                tmpArray = new ArrayList<>();
             }
             else{
                 tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_16.png"));
+                tmp = scale(tmp, 64, 64);
                 tmpArray.add(tmp);
                 tilesList.add(tmpArray);
                 tmpArray = new ArrayList<>();
                 System.out.println("Size of tilesList: " + tilesList.size());
-            }
+            }*/
+            
         }
+        
         // Filling up last row of tiles.
         
-        for(int j = 0; j < tilesW - 1; j++){
+        /*for(int j = 0; j < tilesW - 2; j++){
             switch(j){
                 case 0:
-                    tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_9.png"));
+                    tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_17.png"));
+                    tmp = scale(tmp, 64, 64);
                     tmpArray.add(tmp);
                     break;
+                case 6:
+                    tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_13.png"));
+                    tmp = scale(tmp, 64, 64);
+                    tmpArray.add(tmp);
                 default:
-                    tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_18.png"));
+                    tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_17.png"));
+                    tmp = scale(tmp, 64, 64);
                     tmpArray.add(tmp);
                     break;    
             } 
+        
+            
         }
-        tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_11.png"));
+        tmp = ImageIO.read(new File("src/res/world/arenaTiles/land_12_bottomright.png"));
+        tmp = scale(tmp, 64, 64);
         tmpArray.add(tmp);
         tilesList.add(tmpArray);
-        System.out.println("Size of tilesList: " + tilesList.size());
+        System.out.println("Size of tilesList: " + tilesList.size());*/
     }
     
     public void draw(Graphics graphics, Game observer){
         
         //System.out.println("Size of tilesList: " + tilesList.size());
+        graphics.drawImage(background, 0, 0, observer);
         
-        for(int i = 0; i < tilesH; i++){
-            for(int j = 0; j < tilesW; j++){
-                graphics.drawImage(tilesList.get(i).get(j), j * 256, i * 256, observer);
+        for(int i = 0; i < 11; i++){
+            for(int j = 0; j < 21; j++){
+                if(!(i == 0 && j == 20))
+                graphics.drawImage(tilesList.get(i).get(j), j * 64, i * 64 + 128, observer);
             }
         }
         

@@ -61,8 +61,8 @@ public class Player extends Character implements CharacterInterface{
     private int magicPower;
     
     // Bounds.
-    public static int characterWidth = (int)(WIDTH * (100.0 / WIDTH));
-    public static int characterHeight = (int)(HEIGHT * (100.0 / HEIGHT));
+    public static int characterWidth = Character.characterWidth;//(int)(WIDTH * (100.0 / WIDTH));
+    public static int characterHeight = Character.characterHeight;//(int)(HEIGHT * (100.0 / HEIGHT));
     private int magicShieldWidth = (int)(4.2 * characterWidth);
     private int magicShieldHeight = (int)(4.12 * characterHeight);
     private int magicShieldAbsorbWidth = (int)(4.26 * characterWidth);

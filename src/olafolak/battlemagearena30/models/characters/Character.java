@@ -3,14 +3,12 @@ package olafolak.battlemagearena30.models.characters;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
-import olafolak.battlemagearena30.controllers.GameController;
 import olafolak.battlemagearena30.models.sprites.Sprite;
 import olafolak.battlemagearena30.models.animations.Animation;
 import olafolak.battlemagearena30.models.animations.AttackAnimation;
@@ -21,8 +19,7 @@ import olafolak.battlemagearena30.models.exceptions.CharacterDiesException;
 import olafolak.battlemagearena30.models.game.Game;
 import static olafolak.battlemagearena30.models.game.Game.*;
 import olafolak.battlemagearena30.models.sprites.BoundsBox;
-import olafolak.battlemagearena30.models.utilities.ImageFlip;
-import static olafolak.battlemagearena30.models.world.Arena.movementArea;
+
 
 public abstract class Character implements CharacterInterface{
 
@@ -69,8 +66,8 @@ public abstract class Character implements CharacterInterface{
     protected int maxHealth;
     
     // Bounds.
-    public static int characterWidth = (int)(WIDTH * (100.0 / WIDTH));
-    public static int characterHeight = (int)(HEIGHT * (100.0 / HEIGHT));
+    public static int characterWidth = 50;//(int)(WIDTH * (100.0 / WIDTH));
+    public static int characterHeight = 50;//(int)(HEIGHT * (100.0 / HEIGHT));
     protected int meleeRangeX = (int)(0.4 * characterWidth);
     protected int meleeRangeY = (int)(0.4 * characterHeight);
     protected int healthBarWidth = characterWidth;
