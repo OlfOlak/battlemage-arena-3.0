@@ -11,6 +11,11 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import olafolak.battlemagearena30.models.animations.*;
 import olafolak.battlemagearena30.models.effects.Fireball;
 import olafolak.battlemagearena30.models.effects.IceBreath;
@@ -22,6 +27,7 @@ import olafolak.battlemagearena30.models.exceptions.animationexceptions.*;
 import olafolak.battlemagearena30.models.game.Game;
 import static olafolak.battlemagearena30.models.game.Game.HEIGHT;
 import static olafolak.battlemagearena30.models.game.Game.WIDTH;
+import olafolak.battlemagearena30.models.utilities.AudioPlayer;
 
 
 /**
@@ -41,6 +47,14 @@ public class Player extends Character implements CharacterInterface{
     private GetHurtAnimation hurtAnimation;
     private DieAnimation dieAnimation;
     private BloodAnimation bloodAnimation;
+    
+    private AudioPlayer castSound;
+    private AudioPlayer swordAttackSound;
+    private AudioPlayer hurtSound;
+    private AudioPlayer magicShieldSound;
+    private AudioPlayer magicShieldAbsorbSound;
+    private AudioPlayer walkSound;
+    
     
     private boolean magicShieldOn = false;
     private boolean shieldAbsorbsDamage = false;
@@ -108,6 +122,19 @@ public class Player extends Character implements CharacterInterface{
         castFireballAnimation = new CastFireballAnimation(60, 1, getAnimationFrames("src/res/effects/fireball", "cast", 11, castFireballWidth, castFireballHeight), 1);        
         castIceBreathAnimation = new CastIceBreathAnimation(60, 1, getAnimationFrames("src/res/effects/iceBreath", "iceBreath_cast", 13, castIceBreathWidth, castIceBreathHeight), 1);
         
+        try{
+            castSound = new AudioPlayer("src/res/sounds/soundEffects/spells/castSpell.wav", false);
+            swordAttackSound = new AudioPlayer("src/res/sounds/soundEffects/combat/swordSwish.wav", false);
+            hurtSound = new AudioPlayer("src/res/sounds/soundEffects/combat/meleeHit.wav", false);
+            magicShieldSound = new AudioPlayer("src/res/sounds/soundEffects/spells/magicShield.wav", false);
+            walkSound = new AudioPlayer("src/res/sounds/soundEffects/ambient/mud02.wav", false);
+            magicShieldAbsorbSound = new AudioPlayer("src/res/sounds/soundEffects/spells/magicShieldAbsorb.wav", false);
+            
+    
+        }catch(Exception e){
+            //System.out.println("Exception catched");
+        }
+        
     }
     
     // Methods.
@@ -141,6 +168,7 @@ public class Player extends Character implements CharacterInterface{
             
             if(shieldAbsorbsDamage)
                 magicShieldAbsorbAnimation.run(originX - (magicShieldAbsorbWidth / 2), originY - (magicShieldAbsorbHeight / 2), graphics, observer);
+
             
             if(castsFireball){
                 idleAnimation.updateDirection(isHeadedRight);
@@ -175,6 +203,14 @@ public class Player extends Character implements CharacterInterface{
             takesDamage = false;
             hurtAnimation.reset();
             bloodAnimation.reset();
+            
+            try{
+                hurtSound.stop();
+                hurtSound = new AudioPlayer("src/res/sounds/soundEffects/combat/meleeHit.wav", false);
+            }catch(Exception ex){
+                
+            }
+            
         }catch(EndOfAttackException e){
             dealDamage();
             isAttacking = false;
@@ -239,6 +275,8 @@ public class Player extends Character implements CharacterInterface{
                             animState = 0;
                             isIdle = true;
                             isMoving = false;
+                            
+    
                         }
                         else{
                             isIdle = false;
@@ -265,6 +303,9 @@ public class Player extends Character implements CharacterInterface{
                                 canGoUp = true;
                                 animState = 1;
                             }
+                            
+                            
+                            
                         }
                     }
                     else{
@@ -295,6 +336,16 @@ public class Player extends Character implements CharacterInterface{
 
             animState = 4;
         }
+        
+        if(walkSound != null){
+            if(isMoving){
+                walkSound.getClip().loop(Clip.LOOP_CONTINUOUSLY);
+                walkSound.play();
+            }else{
+                walkSound.pause();
+            }
+        }
+        
     }
     
     private void updateAnimations(){
@@ -339,6 +390,7 @@ public class Player extends Character implements CharacterInterface{
     
     public void attack(){
         isAttacking = true;
+        swordAttackSound.getClip().loop(1);
     }
     
     private void dealDamage(){
@@ -367,31 +419,45 @@ public class Player extends Character implements CharacterInterface{
             }
             else
                 takesDamage = true;
+            hurtSound.getClip().loop(1);
         }
-        else
+        else{
             shieldAbsorbsDamage = true;
+            magicShieldAbsorbSound.getClip().loop(1);
+            System.out.println("Shield absorb!");
+        }
     }
     
     public void setupMagicShield(){
         
-        if(magicShieldOn == false)
+        if(!magicShieldOn){
             magicShieldOn = true;
-        else
+            magicShieldSound.getClip().loop(Clip.LOOP_CONTINUOUSLY);
+            magicShieldSound.play();
+        }else{
             magicShieldOn = false;
-        
+            magicShieldSound.pause();
+        }
+
     }
     
     public void throwFireball(){
         stopMovement();
         isLocked = true;
-        castsFireball = true;    
+        castsFireball = true; 
+        try{
+            castSound.getClip().loop(1);
+        }catch(Exception e){
+            
+        }
     }
     
     public void iceBreath(){
         stopMovement();
         isLocked = true;
         castsIceBreath = true;
-        generateIceBreath();    
+        generateIceBreath();
+        castSound.getClip().loop(1);
     }
     
     private void generateFireball(){

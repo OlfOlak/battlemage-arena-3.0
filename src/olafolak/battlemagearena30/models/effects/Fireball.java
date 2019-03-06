@@ -16,6 +16,7 @@ import olafolak.battlemagearena30.models.exceptions.EndOfFireballException;
 import olafolak.battlemagearena30.models.exceptions.EndSingleAnimationException;
 import olafolak.battlemagearena30.models.game.Game;
 import olafolak.battlemagearena30.models.sprites.BoundsBox;
+import olafolak.battlemagearena30.models.utilities.AudioPlayer;
 
 /**
  *
@@ -32,6 +33,8 @@ public class Fireball extends Effect{
     private boolean dealtDamage = false;
     private BoundsBox explosionArea;
     private BoundsBox projectileArea;
+    private AudioPlayer fireballSound;
+    private AudioPlayer explosionSound;
     
     // Bounds.
     private int projectileWidth = (int)(0.6 * characterWidth);
@@ -57,7 +60,15 @@ public class Fireball extends Effect{
             flyAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/fireball", "projectile_left", 9, projectileWidth, projectileHeight), 0);
         
         explosionAnimation = new Animation(60, 1, getAnimationFrames("src/res/effects/fireball", "explosion", 13, explosionWidth, explosionHeight), 1);
-        //smokeAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/fireball", "smoke", 13, 300, 300), 1);    
+        //smokeAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/fireball", "smoke", 13, 300, 300), 1); 
+        
+        try{
+            fireballSound = new AudioPlayer("src/res/sounds/soundEffects/spells/foom_0.wav", false);
+            explosionSound = new AudioPlayer("src/res/sounds/soundEffects/explosions/explodemini.wav", false);
+        }catch(Exception e){
+            
+        }
+        fireballSound.play();
     }
     
     public void draw(Graphics graphics, Game observer) throws EndOfFireballException{
@@ -65,9 +76,10 @@ public class Fireball extends Effect{
         try{
             if(flys == true){
                 flyAnimation.run(x, y, graphics, observer);
-                graphics.drawRect(x, y, projectileWidth, projectileHeight);
+                graphics.drawRect(x, y, projectileWidth, projectileHeight * 2);
             }
             else{ 
+                explosionSound.play();
                 explosionArea = new BoundsBox(originX, originY, explosionAreaWidth, explosionAreaHeight);
                 explosionAnimation.run(originX - (explosionWidth / 2), originY - (explosionHeight / 2), graphics, observer);
                 if(!dealtDamage){
@@ -119,7 +131,7 @@ public class Fireball extends Effect{
             originX = x + (projectileWidth / 2);
             originY = y + (projectileHeight / 2);
         }
-        projectileArea.setBounds(x, y, projectileWidth, projectileHeight);
+        projectileArea.setBounds(x, y, projectileWidth, projectileHeight * 2);
         
     }
     

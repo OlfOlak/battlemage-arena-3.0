@@ -38,6 +38,7 @@ import olafolak.battlemagearena30.models.game.Game;
 import static olafolak.battlemagearena30.models.game.Game.HEIGHT;
 import static olafolak.battlemagearena30.models.game.Game.WIDTH;
 import olafolak.battlemagearena30.models.sprites.BoundsBox;
+import olafolak.battlemagearena30.models.utilities.AudioPlayer;
 
 /**
  *
@@ -58,6 +59,11 @@ public class Enemy extends Character implements CharacterInterface{
     private PathFinder pathFinder;
     private int attackTimer = 0;
     private Player player;
+    
+    // Sounds.
+    private AudioPlayer walkSound;
+    private AudioPlayer meleeAttackSound;
+    private AudioPlayer hurtSound;
     
     // Bounds.
     public static int characterWidth = Character.characterWidth;//(int)(WIDTH * (100.0 / WIDTH));
@@ -93,12 +99,19 @@ public class Enemy extends Character implements CharacterInterface{
         freezeAnimation = new FreezeAnimation(60, 2, getAnimationFrames("src/res/effects/freeze", "freeze", 6, freezeAnimationWidth, freezeAnimationHeight), 1);
         frozenAnimation = new FrozenAnimation(60, 5, getAnimationFrames("src/res/effects/freeze", "frozen", 1, freezeAnimationWidth, freezeAnimationHeight), 1);
         
-        
+        try{
+            meleeAttackSound = new AudioPlayer("src/res/sounds/soundEffects/combat/swordSwish.wav", false);
+            hurtSound = new AudioPlayer("src/res/sounds/soundEffects/combat/meleeHit.wav", false);
+            //walkSound = new AudioPlayer("src/res/sounds/soundEffects/ambient/step.wav", true);
+    
+        }catch(Exception e){
+            
+        }
     }
 
     @Override
     public void draw(Graphics graphics, Game observer) throws EnemyDiesException{
-        // TODO: make separate animation and exception types. 
+         
         try{
             if(isIdle){
                 idleAnimation.updateDirection(isHeadedRight);
@@ -142,7 +155,7 @@ public class Enemy extends Character implements CharacterInterface{
             bloodAnimation.reset();
         }catch(EndOfAttackException e){
             isAttacking = false;
-            attackAnimation.reset(); 
+            attackAnimation.reset();
         }catch(EndOfBloodException e){
             bloodAnimation.reset();
         }catch(EndOfFreezeException e){
@@ -193,6 +206,12 @@ public class Enemy extends Character implements CharacterInterface{
                             animState = 0;
                             isIdle = true;
                             isMoving = false;
+                            /*try{
+                                walkSound.stop();
+                                walkSound = new AudioPlayer("src/res/sounds/soundEffects/ambient/step.wav", true);
+                            }catch(Exception e){
+                                
+                            }*/
                         }
                         else{
                             isIdle = false;
@@ -219,6 +238,7 @@ public class Enemy extends Character implements CharacterInterface{
                                 canGoUp = true;
                                 animState = 1;
                             }
+                            //walkSound.play();
                         }
                     }
                     else{
@@ -281,6 +301,7 @@ public class Enemy extends Character implements CharacterInterface{
         else
             takesDamage = true;
         
+        //hurtSound.getClip().loop(1);
     }
     
     public void freeze(){
@@ -318,7 +339,8 @@ public class Enemy extends Character implements CharacterInterface{
     private void attack(Player player){  
         isAttacking = true;
         attackTimer = 1;   
-        
+        meleeAttackSound.getClip().loop(1);
+        player.takeDamage(1);
     }
     
     // Setters and getters.

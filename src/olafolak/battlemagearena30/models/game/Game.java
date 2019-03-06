@@ -14,8 +14,7 @@ import java.io.IOException;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
+import javafx.embed.swing.JFXPanel;
 import javax.imageio.ImageIO;
 import olafolak.battlemagearena30.models.characters.Enemy;
 import olafolak.battlemagearena30.models.utilities.KeyControl;
@@ -51,6 +50,7 @@ public class Game extends Canvas implements Runnable {
     
     private Graphics graphics;
     
+    final JFXPanel fxPanel = new JFXPanel();;
     private AudioPlayer bgMusic;
     
     public ArrayList<Enemy> allEnemysList;
@@ -62,20 +62,24 @@ public class Game extends Canvas implements Runnable {
         try{
             allEnemysList = new ArrayList<>();
             player = new Player(100, 100, 7, 10000, 100);
-            //enemy = new Enemy(400, 600, 1, 150, player);
-            //allEnemysList.add(enemy);
-            //enemy = new Enemy(500, 300, 0, 100, player);
-            //allEnemysList.add(enemy);
-            //enemy = new Enemy(700, 300, 1, 100, player);
-            //allEnemysList.add(enemy);
+            enemy = new Enemy(400, 600, 1, 150, player);
+            allEnemysList.add(enemy);
+            enemy = new Enemy(500, 300, 2, 100, player);
+            allEnemysList.add(enemy);
+            enemy = new Enemy(700, 300, 3, 100, player);
+            allEnemysList.add(enemy);
             arena = new Arena((WINDOW_WIDTH), (WINDOW_HEIGHT));
             background = ImageIO.read(new File("src/res/world/arenaTiles/bg.png"));
             background = scale(background, 1280, 768);
             
             // "src/res/sounds/music/bgMusic1.mp3"
-            Media hit = new Media(getClass().getResource("src/res/sounds/music/bgMusic1.mp3").toExternalForm());
-            MediaPlayer mediaPlayer = new MediaPlayer(hit);
-            mediaPlayer.play();
+            try{
+                bgMusic = new AudioPlayer("src/res/sounds/music/bgMusic1.wav", false);
+            }catch(Exception e){
+                
+            }
+            bgMusic.getClip().loop(1);
+            
         } catch(IOException e){
             e.printStackTrace();
         }
@@ -90,6 +94,7 @@ public class Game extends Canvas implements Runnable {
         running = true;
         thread = new Thread(this);
         thread.start();
+        
         
     }
     

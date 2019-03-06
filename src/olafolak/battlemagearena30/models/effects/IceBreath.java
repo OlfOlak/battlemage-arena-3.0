@@ -17,6 +17,7 @@ import olafolak.battlemagearena30.models.exceptions.EndOfIceBreathException;
 import olafolak.battlemagearena30.models.exceptions.EndSingleAnimationException;
 import olafolak.battlemagearena30.models.game.Game;
 import olafolak.battlemagearena30.models.sprites.BoundsBox;
+import olafolak.battlemagearena30.models.utilities.AudioPlayer;
 
 /**
  *
@@ -27,6 +28,8 @@ public class IceBreath extends Effect{
     //Technical fields.
     private Animation breathAnimation;
     private BoundsBox freezeArea;
+    
+    private AudioPlayer freezeSound;
     
     private boolean frozeEnemys = false;
     
@@ -49,6 +52,12 @@ public class IceBreath extends Effect{
             freezeArea = new BoundsBox(x - (int)(0.95 * characterWidth) + (int)(1.5 * characterWidth) , y + (int)(0.1 * characterHeight), freezeAreaWidth, freezeAreaHeight);
         }
         
+        try{
+            freezeSound = new AudioPlayer("src/res/sounds/soundEffects/spells/freeze2.wav", false);
+        }catch(Exception e){
+            
+        }
+        
     }
     
     public void draw(Graphics graphics, Game observer) throws EndOfIceBreathException{
@@ -59,6 +68,7 @@ public class IceBreath extends Effect{
             if(!frozeEnemys){
                 freezeEnemys();
                 frozeEnemys = true;
+                freezeSound.play();
             }
         }
         catch(EndSingleAnimationException e){
