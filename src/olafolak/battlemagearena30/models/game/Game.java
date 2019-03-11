@@ -19,8 +19,12 @@ import javax.imageio.ImageIO;
 import olafolak.battlemagearena30.models.characters.Enemy;
 import olafolak.battlemagearena30.models.utilities.KeyControl;
 import olafolak.battlemagearena30.models.characters.Player;
+import olafolak.battlemagearena30.models.exceptions.EndOfMagicShieldException;
 import olafolak.battlemagearena30.models.exceptions.EnemyDiesException;
 import olafolak.battlemagearena30.models.exceptions.PlayerDiesException;
+import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfCastFireballException;
+import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfCastIceBreathException;
+import olafolak.battlemagearena30.models.hud.PlayerPanel;
 import olafolak.battlemagearena30.models.utilities.AudioPlayer;
 import olafolak.battlemagearena30.models.world.Arena;
 
@@ -31,7 +35,7 @@ import olafolak.battlemagearena30.models.world.Arena;
  */
 public class Game extends Canvas implements Runnable {
 
-    public static final int SCALE = 10;
+    public static final int SCALE = 5;
     public static final double WIDTH = 256.0;
     public static final double HEIGHT = WIDTH * 0.6;
     public static final double WINDOW_WIDTH = WIDTH * SCALE;
@@ -47,6 +51,7 @@ public class Game extends Canvas implements Runnable {
     private Player player;
     private Enemy enemy;
     private Arena arena;
+    private PlayerPanel playerPanel;
     
     private Graphics graphics;
     
@@ -62,23 +67,23 @@ public class Game extends Canvas implements Runnable {
         try{
             allEnemysList = new ArrayList<>();
             player = new Player(100, 100, 7, 10000, 100);
-            enemy = new Enemy(400, 600, 1, 150, player);
+            /*enemy = new Enemy(400, 600, 1, 150, player);
             allEnemysList.add(enemy);
             enemy = new Enemy(500, 300, 2, 100, player);
             allEnemysList.add(enemy);
             enemy = new Enemy(700, 300, 3, 100, player);
-            allEnemysList.add(enemy);
+            allEnemysList.add(enemy);*/
             arena = new Arena((WINDOW_WIDTH), (WINDOW_HEIGHT));
+            playerPanel = new PlayerPanel(0, 650, 100, 100, 0, 0, 5, 5, 5);
             background = ImageIO.read(new File("src/res/world/arenaTiles/bg.png"));
             background = scale(background, 1280, 768);
             
-            // "src/res/sounds/music/bgMusic1.mp3"
             try{
                 bgMusic = new AudioPlayer("src/res/sounds/music/bgMusic1.wav", false);
             }catch(Exception e){
                 
             }
-            bgMusic.getClip().loop(1);
+            //bgMusic.getClip().loop(1);
             
         } catch(IOException e){
             e.printStackTrace();
@@ -160,6 +165,8 @@ public class Game extends Canvas implements Runnable {
         player.tick();
         player.updateEnemysList(allEnemysList);
         
+        playerPanel.tick();
+        
         for(Enemy e : allEnemysList){
             e.tick(player);
         }
@@ -184,12 +191,16 @@ public class Game extends Canvas implements Runnable {
             
             for(Enemy e : allEnemysList)
                 e.draw(graphics, this);
-            player.draw(graphics, this);
-            
+            player.draw(graphics, this, 1);
+            playerPanel.draw(graphics, this);
         }catch(EnemyDiesException e){
             allEnemysList.remove(e.getEnemy());
         }catch(PlayerDiesException e){
             player = null;
+        }catch(EndOfCastFireballException e){
+            playerPanel.fireballCooldown();
+        }catch(EndOfCastIceBreathException e){
+            playerPanel.iceBreathCooldown();
         }
         
         
@@ -222,7 +233,11 @@ public class Game extends Canvas implements Runnable {
                 player.attack();
                 break;
             case KeyEvent.VK_1:
+                try{
                 player.setupMagicShield();
+                }catch(EndOfMagicShieldException ex){
+                    playerPanel.magicShieldCooldown();
+                }
                 break;
             case KeyEvent.VK_2:
                 player.throwFireball();

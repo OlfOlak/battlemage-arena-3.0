@@ -76,7 +76,7 @@ public class Fireball extends Effect{
         try{
             if(flys == true){
                 flyAnimation.run(x, y, graphics, observer);
-                graphics.drawRect(x, y, projectileWidth, projectileHeight * 2);
+                graphics.drawRect(projectileArea.x, projectileArea.y, projectileArea.width, projectileArea.height);
             }
             else{ 
                 explosionSound.play();
@@ -131,7 +131,7 @@ public class Fireball extends Effect{
             originX = x + (projectileWidth / 2);
             originY = y + (projectileHeight / 2);
         }
-        projectileArea.setBounds(x, y, projectileWidth, projectileHeight * 2);
+        projectileArea.setBoundsByOrigin(originX, originY, projectileWidth, projectileHeight * 2);
         
     }
     

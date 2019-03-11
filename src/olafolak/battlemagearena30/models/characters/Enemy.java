@@ -156,6 +156,12 @@ public class Enemy extends Character implements CharacterInterface{
         }catch(EndOfAttackException e){
             isAttacking = false;
             attackAnimation.reset();
+            
+            /*try{
+                meleeAttackSound = new AudioPlayer("src/res/sounds/soundEffects/combat/swordSwish.wav", false);
+            }catch(Exception ex){
+
+            }*/
         }catch(EndOfBloodException e){
             bloodAnimation.reset();
         }catch(EndOfFreezeException e){
@@ -301,7 +307,7 @@ public class Enemy extends Character implements CharacterInterface{
         else
             takesDamage = true;
         
-        //hurtSound.getClip().loop(1);
+        hurtSound.getClip().loop(1);
     }
     
     public void freeze(){

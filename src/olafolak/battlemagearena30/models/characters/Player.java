@@ -21,6 +21,7 @@ import olafolak.battlemagearena30.models.effects.Fireball;
 import olafolak.battlemagearena30.models.effects.IceBreath;
 import olafolak.battlemagearena30.models.exceptions.EndOfFireballException;
 import olafolak.battlemagearena30.models.exceptions.EndOfIceBreathException;
+import olafolak.battlemagearena30.models.exceptions.EndOfMagicShieldException;
 import olafolak.battlemagearena30.models.exceptions.EndSingleAnimationException;
 import olafolak.battlemagearena30.models.exceptions.PlayerDiesException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.*;
@@ -138,8 +139,15 @@ public class Player extends Character implements CharacterInterface{
     }
     
     // Methods.
-    @Override
+    @Override 
     public void draw(Graphics graphics, Game observer) throws PlayerDiesException{
+        
+    }
+    
+    public void draw(Graphics graphics, Game observer, int i)
+            throws PlayerDiesException,
+            EndOfCastFireballException,
+            EndOfCastIceBreathException{
         
         try{
             if(isIdle){
@@ -203,14 +211,6 @@ public class Player extends Character implements CharacterInterface{
             takesDamage = false;
             hurtAnimation.reset();
             bloodAnimation.reset();
-            
-            try{
-                hurtSound.stop();
-                hurtSound = new AudioPlayer("src/res/sounds/soundEffects/combat/meleeHit.wav", false);
-            }catch(Exception ex){
-                
-            }
-            
         }catch(EndOfAttackException e){
             dealDamage();
             isAttacking = false;
@@ -225,9 +225,11 @@ public class Player extends Character implements CharacterInterface{
             castsFireball = false;
             throwsFireball = true;
             generateFireball();
+            throw new EndOfCastFireballException();
         }catch(EndOfCastIceBreathException e){
             castsIceBreath = false;
-            firesIceBreath = true;                
+            firesIceBreath = true;  
+            throw new EndOfCastIceBreathException();
         }catch(EndOfFireballException e){
             fireballsList.remove(e.getFireball());
             if(fireballsList.isEmpty())
@@ -390,7 +392,9 @@ public class Player extends Character implements CharacterInterface{
     
     public void attack(){
         isAttacking = true;
+        
         swordAttackSound.getClip().loop(1);
+        
     }
     
     private void dealDamage(){
@@ -428,7 +432,7 @@ public class Player extends Character implements CharacterInterface{
         }
     }
     
-    public void setupMagicShield(){
+    public void setupMagicShield() throws EndOfMagicShieldException{
         
         if(!magicShieldOn){
             magicShieldOn = true;
@@ -437,6 +441,7 @@ public class Player extends Character implements CharacterInterface{
         }else{
             magicShieldOn = false;
             magicShieldSound.pause();
+            throw new EndOfMagicShieldException();
         }
 
     }
@@ -445,11 +450,9 @@ public class Player extends Character implements CharacterInterface{
         stopMovement();
         isLocked = true;
         castsFireball = true; 
-        try{
-            castSound.getClip().loop(1);
-        }catch(Exception e){
-            
-        }
+        
+        castSound.getClip().loop(1);
+        
     }
     
     public void iceBreath(){
