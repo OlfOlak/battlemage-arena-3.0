@@ -73,7 +73,8 @@ public class Player extends Character implements CharacterInterface{
     private int height = 100;
     
     // Attribute fields.
-    private int magicPower;
+    private int mana;
+    private int maxMana;
     
     // Bounds.
     public static int characterWidth = Character.characterWidth;//(int)(WIDTH * (100.0 / WIDTH));
@@ -91,9 +92,10 @@ public class Player extends Character implements CharacterInterface{
     private int iceBreathPositionY = (int)(0.4 * characterHeight);
     
     // Constructors.
-    public Player(int x, int y, int speed, int health, int magicPower) throws IOException{
+    public Player(int x, int y, int speed, int health, int mana) throws IOException{
         super(x, y, speed, health);
-        this.magicPower = magicPower;
+        this.mana = mana;
+        this.maxMana = mana;
 
         fireballsList = new ArrayList<>();
         enemysList = new ArrayList<>();
@@ -251,15 +253,12 @@ public class Player extends Character implements CharacterInterface{
     
     @Override
     public void tick(){
-        
         updateMovement();
         updateBounds();
         checkArenaCollisions();
         updateAnimations();
         //System.out.println("boundsBox.x: " + boundsBox.x + " boundsBox.y: " + boundsBox.y);
-        //System.out.println("shieldAbsorbsDamage: " + shieldAbsorbsDamage);
-        
-
+        System.out.println("mana: " + mana);
     }
     
     public void updateEnemysList(ArrayList<Enemy> enemysList){
@@ -432,6 +431,20 @@ public class Player extends Character implements CharacterInterface{
         }
     }
     
+    public void restoreHealth(int restoration){
+        if((maxHealth - health) < restoration)
+            health = maxHealth;
+        else
+            health += restoration;
+    }
+    
+    public void restoreMana(int restoration){
+        if((maxMana - mana) < restoration)
+            mana = maxMana;
+        else
+            mana += restoration;
+    }
+    
     public void setupMagicShield() throws EndOfMagicShieldException{
         
         if(!magicShieldOn){
@@ -450,6 +463,7 @@ public class Player extends Character implements CharacterInterface{
         stopMovement();
         isLocked = true;
         castsFireball = true; 
+        mana -= 20;
         
         castSound.getClip().loop(1);
         
@@ -460,6 +474,7 @@ public class Player extends Character implements CharacterInterface{
         isLocked = true;
         castsIceBreath = true;
         generateIceBreath();
+        mana -= 20;
         castSound.getClip().loop(1);
     }
     
@@ -520,6 +535,23 @@ public class Player extends Character implements CharacterInterface{
     
     
     
+    // Setters and getters.
+
+    public int getMana() {
+        return mana;
+    }
+
+    public void setMana(int mana) {
+        this.mana = mana;
+    }
+
+    public int getMaxMana() {
+        return maxMana;
+    }
+
+    public void setMaxMana(int maxMana) {
+        this.maxMana = maxMana;
+    }
     
     
     

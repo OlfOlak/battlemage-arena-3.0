@@ -346,7 +346,7 @@ public class Enemy extends Character implements CharacterInterface{
         isAttacking = true;
         attackTimer = 1;   
         meleeAttackSound.getClip().loop(1);
-        player.takeDamage(1);
+        player.takeDamage(10);
     }
     
     // Setters and getters.

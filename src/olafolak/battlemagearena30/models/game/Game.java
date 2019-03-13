@@ -25,6 +25,7 @@ import olafolak.battlemagearena30.models.exceptions.PlayerDiesException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfCastFireballException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfCastIceBreathException;
 import olafolak.battlemagearena30.models.hud.PlayerPanel;
+import olafolak.battlemagearena30.models.hud.ProgressPanel;
 import olafolak.battlemagearena30.models.utilities.AudioPlayer;
 import olafolak.battlemagearena30.models.world.Arena;
 
@@ -52,6 +53,7 @@ public class Game extends Canvas implements Runnable {
     private Enemy enemy;
     private Arena arena;
     private PlayerPanel playerPanel;
+    private ProgressPanel progressPanel;
     
     private Graphics graphics;
     
@@ -66,15 +68,16 @@ public class Game extends Canvas implements Runnable {
         addKeyListener(new KeyControl(this));
         try{
             allEnemysList = new ArrayList<>();
-            player = new Player(100, 100, 7, 10000, 100);
-            /*enemy = new Enemy(400, 600, 1, 150, player);
-            allEnemysList.add(enemy);
+            player = new Player(100, 100, 7, 100, 100);
+            enemy = new Enemy(400, 600, 1, 150, player);
+            allEnemysList.add(enemy);/*
             enemy = new Enemy(500, 300, 2, 100, player);
             allEnemysList.add(enemy);
             enemy = new Enemy(700, 300, 3, 100, player);
             allEnemysList.add(enemy);*/
             arena = new Arena((WINDOW_WIDTH), (WINDOW_HEIGHT));
-            playerPanel = new PlayerPanel(0, 650, 100, 100, 0, 0, 5, 5, 5);
+            playerPanel = new PlayerPanel(0, 700, 100, 100, 1, 1, 5, 5, 5);
+            progressPanel = new ProgressPanel((int)(WINDOW_WIDTH - (0.2 * WINDOW_WIDTH)), 700, 3);
             background = ImageIO.read(new File("src/res/world/arenaTiles/bg.png"));
             background = scale(background, 1280, 768);
             
@@ -166,6 +169,7 @@ public class Game extends Canvas implements Runnable {
         player.updateEnemysList(allEnemysList);
         
         playerPanel.tick();
+        playerPanel.updatePlayerData(player.getHealth(), player.getMana());
         
         for(Enemy e : allEnemysList){
             e.tick(player);
@@ -193,6 +197,7 @@ public class Game extends Canvas implements Runnable {
                 e.draw(graphics, this);
             player.draw(graphics, this, 1);
             playerPanel.draw(graphics, this);
+            progressPanel.draw(graphics, this);
         }catch(EnemyDiesException e){
             allEnemysList.remove(e.getEnemy());
         }catch(PlayerDiesException e){
@@ -234,16 +239,27 @@ public class Game extends Canvas implements Runnable {
                 break;
             case KeyEvent.VK_1:
                 try{
-                player.setupMagicShield();
+                    if(!playerPanel.isMagicShieldCooldowns())
+                        player.setupMagicShield();
                 }catch(EndOfMagicShieldException ex){
                     playerPanel.magicShieldCooldown();
                 }
                 break;
             case KeyEvent.VK_2:
-                player.throwFireball();
+                if(!playerPanel.isFireballCooldowns())
+                    player.throwFireball();
                 break;
             case KeyEvent.VK_3:
-                player.iceBreath();
+                if(!playerPanel.isIceBreathCooldowns())
+                    player.iceBreath();
+                break;
+            case KeyEvent.VK_4:
+                if(playerPanel.drinkHealthPotion())
+                    player.restoreHealth(30);
+                break;
+            case KeyEvent.VK_5:
+                if(playerPanel.drinkManaPotion())
+                    player.restoreMana(20);
                 break;
             default:
                 break;
