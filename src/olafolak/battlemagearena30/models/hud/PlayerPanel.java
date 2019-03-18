@@ -97,7 +97,7 @@ public class PlayerPanel {
         this.iceBreathCooldown = icebreathCooldown;
         
         /*try {
-            drinkSound = new AudioPlayer("src/res/sounds/soundEffects/ambient/bubble2.wav", false);
+            drinkSound = new AudioPlayer("src/res/sounds/soundEffects/ambient/drink.wav", false);
         } catch (UnsupportedAudioFileException ex) {
             Logger.getLogger(PlayerPanel.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -276,7 +276,7 @@ public class PlayerPanel {
             return false;
         else{
             manaPotionCount--;
-            drinkSound.getClip().loop(1);
+            //drinkSound.getClip().loop(1);
             return true;
         }
     }

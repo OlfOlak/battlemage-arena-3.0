@@ -10,9 +10,8 @@ import java.awt.Rectangle;
 import java.io.IOException;
 import java.util.ArrayList;
 import olafolak.battlemagearena30.models.animations.Animation;
-import static olafolak.battlemagearena30.models.characters.Character.characterHeight;
-import static olafolak.battlemagearena30.models.characters.Character.characterWidth;
 import olafolak.battlemagearena30.models.characters.Enemy;
+import olafolak.battlemagearena30.models.characters.Player;
 import olafolak.battlemagearena30.models.exceptions.EndOfIceBreathException;
 import olafolak.battlemagearena30.models.exceptions.EndSingleAnimationException;
 import olafolak.battlemagearena30.models.game.Game;
@@ -34,10 +33,10 @@ public class IceBreath extends Effect{
     private boolean frozeEnemys = false;
     
     // Bounds.
-    private int breathWidth = (int)(1.5 * characterWidth);
-    private int breathHeight = (int)(0.6 * characterHeight);
-    private int freezeAreaWidth = (int)(1.0 * characterWidth);
-    private int freezeAreaHeight = (int)(0.8 * characterHeight);
+    private int breathWidth = (int)(1.5 * Player.characterWidth);
+    private int breathHeight = (int)(0.6 * Player.characterHeight);
+    private int freezeAreaWidth = (int)(1.0 * Player.characterWidth);
+    private int freezeAreaHeight = (int)(0.8 * Player.characterHeight);
     
     public IceBreath(int x, int y, int range, boolean rightDirection, ArrayList<Enemy> enemysList) throws IOException{
         
@@ -45,11 +44,11 @@ public class IceBreath extends Effect{
 
         if(isHeadedRight == true){
             breathAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/iceBreath", "iceBreath_right", 9, breathWidth, breathHeight), 1);
-            freezeArea = new BoundsBox(x + (int)(0.95 * characterWidth), y + (int)(0.1 * characterHeight), freezeAreaWidth, freezeAreaHeight);
+            freezeArea = new BoundsBox(x + (int)(0.95 * Player.characterWidth), y + (int)(0.1 * Player.characterHeight), freezeAreaWidth, freezeAreaHeight);
         }
         else{
             breathAnimation = new Animation(60, 0.5, getAnimationFrames("src/res/effects/iceBreath", "iceBreath_left", 9, breathWidth, breathHeight), 1);
-            freezeArea = new BoundsBox(x - (int)(0.95 * characterWidth) + (int)(1.5 * characterWidth) , y + (int)(0.1 * characterHeight), freezeAreaWidth, freezeAreaHeight);
+            freezeArea = new BoundsBox(x - (int)(0.95 * Player.characterWidth) + (int)(1.5 * Player.characterWidth) , y + (int)(0.1 * Player.characterHeight), freezeAreaWidth, freezeAreaHeight);
         }
         
         try{

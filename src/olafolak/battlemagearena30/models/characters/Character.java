@@ -19,15 +19,19 @@ import olafolak.battlemagearena30.models.exceptions.CharacterDiesException;
 import olafolak.battlemagearena30.models.game.Game;
 import static olafolak.battlemagearena30.models.game.Game.*;
 import olafolak.battlemagearena30.models.sprites.BoundsBox;
+import olafolak.battlemagearena30.models.world.Arena;
+import static olafolak.battlemagearena30.models.world.Arena.movementArea;
 
 
-public abstract class Character implements CharacterInterface{
+public abstract class Character implements CharacterInterface, Comparable<Character>{
 
     // Technical fields.
     protected int x;
     protected int y;
     protected int originX;
     protected int originY;
+    protected int baseX;
+    protected int baseY;
     protected int speed;
     protected boolean canGoRight = true;
     protected boolean canGoLeft = true;
@@ -59,6 +63,7 @@ public abstract class Character implements CharacterInterface{
     protected BoundsBox leftRangeBox;
     protected BoundsBox rightRangeBox;
     protected BoundsBox healthBar;
+    protected BoundsBox baseline;
     protected Sprite sprite;
     
     // Attribute fields.
@@ -66,8 +71,8 @@ public abstract class Character implements CharacterInterface{
     protected int maxHealth;
     
     // Bounds.
-    public static int characterWidth = 50;//(int)(WIDTH * (100.0 / WIDTH));
-    public static int characterHeight = 50;//(int)(HEIGHT * (100.0 / HEIGHT));
+    private int characterWidth = 50;
+    private int characterHeight = 50;
     protected int meleeRangeX = (int)(0.4 * characterWidth);
     protected int meleeRangeY = (int)(0.4 * characterHeight);
     protected int healthBarWidth = characterWidth;
@@ -80,14 +85,17 @@ public abstract class Character implements CharacterInterface{
         this.y = y;
         this.originX = x + (characterWidth / 2);
         this.originY = y + (characterHeight / 2);
+        this.baseX = originX;
+        this.baseY = originY + (characterHeight / 2);
         this.speed = speed;
         this.health = health;
         this.maxHealth = health;
 
-        boundsBox = new BoundsBox(originX, originY, (int)characterWidth, (int)characterHeight);
+        boundsBox = new BoundsBox(originX, originY, characterWidth, characterHeight);
         leftRangeBox = new BoundsBox(x, originY, meleeRangeX, meleeRangeY);
         rightRangeBox = new BoundsBox(x + characterWidth, originY, meleeRangeX, meleeRangeY);
         healthBar = new BoundsBox(originX, y - (healthBarHeight / 2), health * healthBarWidth / maxHealth, healthBarHeight);
+        baseline = new BoundsBox(baseX, baseY, characterWidth, 1);
 
     }
 
@@ -111,6 +119,8 @@ public abstract class Character implements CharacterInterface{
         
         originX = x + (characterWidth / 2);
         originY = y + (characterHeight / 2);
+        baseX = originX;
+        baseY = originY + (characterHeight / 2);
         
         boundsBox.setBoundsByOrigin(originX, originY, characterWidth, characterHeight);
         leftRangeBox.setBoundsByOrigin(x, originY, meleeRangeX, meleeRangeY);
@@ -121,15 +131,15 @@ public abstract class Character implements CharacterInterface{
     
     protected void checkArenaCollisions(){
 
-        if(x >= 1180)
+        if(baseX >= (movementArea.x + movementArea.width))
             canGoRight = false;
-        if(x <= 0)
+        if(baseX <= movementArea.x)
             canGoLeft = false;
-        if(y >= 640)
+        if(baseY >= (movementArea.y + movementArea.height))
             canGoDown = false;
-        if(y <= 20)
+        if(baseY <= movementArea.y)
             canGoUp = false;
-
+        
     }
     
 
@@ -162,6 +172,16 @@ public abstract class Character implements CharacterInterface{
         }
 
         return tmp;
+    }
+    
+    @Override 
+    public int compareTo(Character ch){
+        if(y == ch.getY())  
+            return 0;  
+        else if(y > ch.getY())  
+            return 1;  
+        else  
+            return -1;  
     }
 
     // Setters and getters.    
@@ -446,22 +466,6 @@ public abstract class Character implements CharacterInterface{
         this.maxHealth = maxHealth;
     }
 
-    public static int getCharacterWidth() {
-        return characterWidth;
-    }
-
-    public static void setCharacterWidth(int characterWidth) {
-        Character.characterWidth = characterWidth;
-    }
-
-    public static int getCharacterHeight() {
-        return characterHeight;
-    }
-
-    public static void setCharacterHeight(int characterHeight) {
-        Character.characterHeight = characterHeight;
-    }
-
     public int getMeleeRangeX() {
         return meleeRangeX;
     }
@@ -493,6 +497,72 @@ public abstract class Character implements CharacterInterface{
     public void setHealthBarHeight(int healthBarHeight) {
         this.healthBarHeight = healthBarHeight;
     }
+
+    public int getBaseX() {
+        return baseX;
+    }
+
+    public void setBaseX(int baseX) {
+        this.baseX = baseX;
+    }
+
+    public int getBaseY() {
+        return baseY;
+    }
+
+    public void setBaseY(int baseY) {
+        this.baseY = baseY;
+    }
+
+    public IdleAnimation getIdleAnimation() {
+        return idleAnimation;
+    }
+
+    public void setIdleAnimation(IdleAnimation idleAnimation) {
+        this.idleAnimation = idleAnimation;
+    }
+
+    public WalkAnimation getWalkAnimation() {
+        return walkAnimation;
+    }
+
+    public void setWalkAnimation(WalkAnimation walkAnimation) {
+        this.walkAnimation = walkAnimation;
+    }
+
+    public AttackAnimation getAttackAnimation() {
+        return attackAnimation;
+    }
+
+    public void setAttackAnimation(AttackAnimation attackAnimation) {
+        this.attackAnimation = attackAnimation;
+    }
+
+    public BoundsBox getBaseline() {
+        return baseline;
+    }
+
+    public void setBaseline(BoundsBox baseline) {
+        this.baseline = baseline;
+    }
+
+    public int getCharacterWidth() {
+        return characterWidth;
+    }
+
+    public void setCharacterWidth(int characterWidth) {
+        this.characterWidth = characterWidth;
+    }
+
+    public int getCharacterHeight() {
+        return characterHeight;
+    }
+
+    public void setCharacterHeight(int characterHeight) {
+        this.characterHeight = characterHeight;
+    }
+    
+    
     
     
     

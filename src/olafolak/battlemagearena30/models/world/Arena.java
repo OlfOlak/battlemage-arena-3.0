@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import olafolak.battlemagearena30.models.game.Game;
+import static olafolak.battlemagearena30.models.game.Game.WINDOW_HEIGHT;
+import static olafolak.battlemagearena30.models.game.Game.WINDOW_WIDTH;
 import olafolak.battlemagearena30.models.sprites.BoundsBox;
 
 /**
@@ -50,6 +52,8 @@ public class Arena {
         } catch(IOException e){
             System.out.println("Problem in arena generation.");
         }
+        
+        movementArea = new BoundsBox((int)(WINDOW_WIDTH / 2), (int)(WINDOW_HEIGHT / 2 + 0.09 * WINDOW_HEIGHT), (int)(0.97 * WINDOW_WIDTH), (int)(0.8 * WINDOW_HEIGHT));
         
     }
     
@@ -265,6 +269,9 @@ public class Arena {
                 graphics.drawImage(tilesList.get(i).get(j), j * 64, i * 64 + 128, observer);
             }
         }
+        
+        graphics.drawRect(movementArea.x, movementArea.y, movementArea.width, movementArea.height);
+        graphics.drawLine(1250, 350, 1330, 350);
         
     }
     

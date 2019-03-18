@@ -8,11 +8,10 @@ package olafolak.battlemagearena30.models.animations;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import static olafolak.battlemagearena30.models.characters.Character.characterHeight;
-import static olafolak.battlemagearena30.models.characters.Character.characterWidth;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfBloodException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfFreezeException;
 import olafolak.battlemagearena30.models.game.Game;
+import olafolak.battlemagearena30.models.characters.Character;
 
 /**
  *
@@ -20,8 +19,13 @@ import olafolak.battlemagearena30.models.game.Game;
  */
 public class FreezeAnimation extends Animation{
     
-    public FreezeAnimation(int fps, double length, ArrayList<BufferedImage> inputFrames, int mode) {
-        super(fps, length, inputFrames, mode);
+    private Character target;
+    
+    
+    public FreezeAnimation(int fps, double length, ArrayList<BufferedImage> inputFrames, Character target) {
+        super(fps, length, inputFrames, 1);
+        
+        this.target = target;
     }
     
     public void run(double x, double y, Graphics graphics, Game observer) throws EndOfFreezeException{
@@ -39,8 +43,8 @@ public class FreezeAnimation extends Animation{
         }
         
         graphics.drawImage(framesList.get(state),
-                (int)(x - (framesList.get(0).getWidth() / 2) + (characterWidth / 2)),
-                (int)(y - (framesList.get(0).getHeight() / 2) + (characterHeight / 2)),
+                (int)(x - (framesList.get(0).getWidth() / 2) + (target.getCharacterWidth() / 2)),
+                (int)(y - (framesList.get(0).getHeight() / 2) + (target.getCharacterHeight() / 2)),
                 observer);         
     }
     

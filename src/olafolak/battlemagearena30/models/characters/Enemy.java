@@ -5,15 +5,10 @@
  */
 package olafolak.battlemagearena30.models.characters;
 
+import olafolak.battlemagearena30.models.ai.PathFinder;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import javax.imageio.ImageIO;
 import olafolak.battlemagearena30.models.animations.Animation;
 import olafolak.battlemagearena30.models.animations.AttackAnimation;
 import olafolak.battlemagearena30.models.animations.BloodAnimation;
@@ -23,11 +18,7 @@ import olafolak.battlemagearena30.models.animations.FrozenAnimation;
 import olafolak.battlemagearena30.models.animations.GetHurtAnimation;
 import olafolak.battlemagearena30.models.animations.IdleAnimation;
 import olafolak.battlemagearena30.models.animations.WalkAnimation;
-import static olafolak.battlemagearena30.models.characters.Player.scale;
-import olafolak.battlemagearena30.models.effects.Fireball;
 import olafolak.battlemagearena30.models.exceptions.EnemyDiesException;
-import olafolak.battlemagearena30.models.exceptions.EndSingleAnimationException;
-import olafolak.battlemagearena30.models.exceptions.PlayerDiesException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfAttackException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfBloodException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfDieException;
@@ -35,9 +26,6 @@ import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfFre
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfFrozenException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfGetHurtException;
 import olafolak.battlemagearena30.models.game.Game;
-import static olafolak.battlemagearena30.models.game.Game.HEIGHT;
-import static olafolak.battlemagearena30.models.game.Game.WIDTH;
-import olafolak.battlemagearena30.models.sprites.BoundsBox;
 import olafolak.battlemagearena30.models.utilities.AudioPlayer;
 
 /**
@@ -52,13 +40,13 @@ public class Enemy extends Character implements CharacterInterface{
     protected BloodAnimation bloodAnimation;
     protected FreezeAnimation freezeAnimation;
     protected FrozenAnimation frozenAnimation;
-    private boolean playerInRange = false;
-    private boolean canAttack = true;
-    private boolean isFreezing = false;
-    private boolean isFrozen = false;
-    private PathFinder pathFinder;
-    private int attackTimer = 0;
-    private Player player;
+    protected boolean playerInRange = false;
+    protected boolean canAttack = true;
+    protected boolean isFreezing = false;
+    protected boolean isFrozen = false;
+    protected PathFinder pathFinder;
+    protected int attackTimer = 0;
+    protected Player player;
     
     // Sounds.
     private AudioPlayer walkSound;
@@ -66,20 +54,20 @@ public class Enemy extends Character implements CharacterInterface{
     private AudioPlayer hurtSound;
     
     // Bounds.
-    public static int characterWidth = Character.characterWidth;//(int)(WIDTH * (100.0 / WIDTH));
-    public static int characterHeight = Character.characterHeight;//(int)(HEIGHT * (100.0 / HEIGHT));
-    private int freezeAnimationWidth = (int)(2.5 * characterWidth);
-    private int freezeAnimationHeight = (int)(2.5 * characterHeight);
+    private int characterWidth = 50;
+    private int characterHeight = 50;
+    protected int freezeAnimationWidth = (int)(2.5 * characterWidth);
+    protected int freezeAnimationHeight = (int)(2.5 * characterHeight);
     
     
     
-    public Enemy(int x, int y, int speed, int health, Player player) throws IOException {
+    public Enemy(int x, int y, int speed, int health, int spawnPoint, Player player) throws IOException {
         super(x, y, speed, health);
         
-        pathFinder = new PathFinder(this, player);
+        pathFinder = new PathFinder(this, player, spawnPoint);
         this.player = player;
         isHeadedRight = false;
-        idleAnimation = new IdleAnimation(60, 0.85,
+        /*idleAnimation = new IdleAnimation(60, 0.85,
                 getAnimationFrames("src/res/sprites/w_warrior", "idle_left", 5, characterWidth, characterHeight),
                 getAnimationFrames("src/res/sprites/w_warrior", "idle_right", 5, characterWidth, characterHeight));
         walkAnimation = new WalkAnimation(60, 0.7, 
@@ -95,9 +83,9 @@ public class Enemy extends Character implements CharacterInterface{
                 getAnimationFrames("src/res/sprites/w_warrior", "die_left", 5, characterWidth, characterHeight),
                 getAnimationFrames("src/res/sprites/w_warrior", "die_right", 5, characterWidth, characterHeight));
         bloodAnimation = new BloodAnimation(60, 0.5, getAnimationFrames("src/res/effects/blood", "blood", 6, characterWidth, characterHeight), 1);
-        
-        freezeAnimation = new FreezeAnimation(60, 2, getAnimationFrames("src/res/effects/freeze", "freeze", 6, freezeAnimationWidth, freezeAnimationHeight), 1);
-        frozenAnimation = new FrozenAnimation(60, 5, getAnimationFrames("src/res/effects/freeze", "frozen", 1, freezeAnimationWidth, freezeAnimationHeight), 1);
+        */
+        freezeAnimation = new FreezeAnimation(60, 2, getAnimationFrames("src/res/effects/freeze", "freeze", 6, freezeAnimationWidth, freezeAnimationHeight), this);
+        frozenAnimation = new FrozenAnimation(60, 5, getAnimationFrames("src/res/effects/freeze", "frozen", 1, freezeAnimationWidth, freezeAnimationHeight), this);
         
         try{
             meleeAttackSound = new AudioPlayer("src/res/sounds/soundEffects/combat/swordSwish.wav", false);
@@ -460,27 +448,4 @@ public class Enemy extends Character implements CharacterInterface{
         this.player = player;
     }
 
-    public static int getCharacterWidth() {
-        return characterWidth;
-    }
-
-    public static void setCharacterWidth(int characterWidth) {
-        Enemy.characterWidth = characterWidth;
-    }
-
-    public static int getCharacterHeight() {
-        return characterHeight;
-    }
-
-    public static void setCharacterHeight(int characterHeight) {
-        Enemy.characterHeight = characterHeight;
-    }
-    
-    
-    
-    
-    
-    
-    
-    
 }

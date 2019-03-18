@@ -11,11 +11,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import olafolak.battlemagearena30.models.animations.*;
 import olafolak.battlemagearena30.models.effects.Fireball;
 import olafolak.battlemagearena30.models.effects.IceBreath;
@@ -26,9 +22,10 @@ import olafolak.battlemagearena30.models.exceptions.EndSingleAnimationException;
 import olafolak.battlemagearena30.models.exceptions.PlayerDiesException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.*;
 import olafolak.battlemagearena30.models.game.Game;
-import static olafolak.battlemagearena30.models.game.Game.HEIGHT;
-import static olafolak.battlemagearena30.models.game.Game.WIDTH;
+import static olafolak.battlemagearena30.models.game.Game.WINDOW_HEIGHT;
+import static olafolak.battlemagearena30.models.game.Game.WINDOW_WIDTH;
 import olafolak.battlemagearena30.models.utilities.AudioPlayer;
+import static olafolak.battlemagearena30.models.world.Arena.movementArea;
 
 
 /**
@@ -77,8 +74,8 @@ public class Player extends Character implements CharacterInterface{
     private int maxMana;
     
     // Bounds.
-    public static int characterWidth = Character.characterWidth;//(int)(WIDTH * (100.0 / WIDTH));
-    public static int characterHeight = Character.characterHeight;//(int)(HEIGHT * (100.0 / HEIGHT));
+    public static int characterWidth = (int)(WINDOW_WIDTH * 50 / 1280);
+    public static int characterHeight = (int)(WINDOW_HEIGHT * 50 / 768);
     private int magicShieldWidth = (int)(4.2 * characterWidth);
     private int magicShieldHeight = (int)(4.12 * characterHeight);
     private int magicShieldAbsorbWidth = (int)(4.26 * characterWidth);
@@ -139,12 +136,17 @@ public class Player extends Character implements CharacterInterface{
         }
         
     }
+
     
+
+    
+
     // Methods.
     @Override 
     public void draw(Graphics graphics, Game observer) throws PlayerDiesException{
         
     }
+    
     
     public void draw(Graphics graphics, Game observer, int i)
             throws PlayerDiesException,
@@ -260,7 +262,7 @@ public class Player extends Character implements CharacterInterface{
         //System.out.println("boundsBox.x: " + boundsBox.x + " boundsBox.y: " + boundsBox.y);
         System.out.println("mana: " + mana);
     }
-    
+
     public void updateEnemysList(ArrayList<Enemy> enemysList){
         this.enemysList = enemysList;
     }

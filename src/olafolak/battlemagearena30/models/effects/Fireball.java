@@ -6,12 +6,11 @@
 package olafolak.battlemagearena30.models.effects;
 
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.io.IOException;
 import java.util.ArrayList;
 import olafolak.battlemagearena30.models.animations.Animation;
 import olafolak.battlemagearena30.models.characters.Enemy;
-import static olafolak.battlemagearena30.models.characters.Character.*;
+import olafolak.battlemagearena30.models.characters.Player;
 import olafolak.battlemagearena30.models.exceptions.EndOfFireballException;
 import olafolak.battlemagearena30.models.exceptions.EndSingleAnimationException;
 import olafolak.battlemagearena30.models.game.Game;
@@ -37,10 +36,10 @@ public class Fireball extends Effect{
     private AudioPlayer explosionSound;
     
     // Bounds.
-    private int projectileWidth = (int)(0.6 * characterWidth);
-    private int projectileHeight = (int)(0.36 * characterHeight);
-    private int explosionWidth = (int)(3.0 * characterWidth);
-    private int explosionHeight = (int)(3.0 * characterHeight);
+    private int projectileWidth = (int)(0.6 * Player.characterWidth);
+    private int projectileHeight = (int)(0.36 * Player.characterHeight);
+    private int explosionWidth = (int)(3.0 * Player.characterWidth);
+    private int explosionHeight = (int)(3.0 * Player.characterHeight);
     private int explosionAreaWidth = (int)(explosionWidth / 3);
     private int explosionAreaHeight = (int)(explosionHeight / 3);
     

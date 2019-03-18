@@ -14,13 +14,18 @@ import java.io.IOException;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import javafx.embed.swing.JFXPanel;
 import javax.imageio.ImageIO;
 import olafolak.battlemagearena30.models.characters.Enemy;
 import olafolak.battlemagearena30.models.utilities.KeyControl;
 import olafolak.battlemagearena30.models.characters.Player;
+import olafolak.battlemagearena30.models.characters.Character;
+import olafolak.battlemagearena30.models.characters.Spearman;
+import olafolak.battlemagearena30.models.exceptions.CharacterDiesException;
 import olafolak.battlemagearena30.models.exceptions.EndOfMagicShieldException;
 import olafolak.battlemagearena30.models.exceptions.EnemyDiesException;
+import olafolak.battlemagearena30.models.exceptions.EnemySpawnedException;
 import olafolak.battlemagearena30.models.exceptions.PlayerDiesException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfCastFireballException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfCastIceBreathException;
@@ -49,14 +54,20 @@ public class Game extends Canvas implements Runnable {
     
     private BufferedImage background = new BufferedImage((int)WINDOW_WIDTH, (int)WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
     
-    private Player player;
+    private Spawner spawner;
+    
+    public static Player player;
     private Enemy enemy;
     private Arena arena;
     private PlayerPanel playerPanel;
     private ProgressPanel progressPanel;
     
-    private Graphics graphics;
+    private ArrayList<Character> renderQueue = new ArrayList<>();
+    private ArrayList<Enemy> abovePlayerRenderQueue;
+    private ArrayList<Enemy> belowPlayerRenderQueue;
     
+    private Graphics graphics;
+    SpawnerThread spawnerThread;
     final JFXPanel fxPanel = new JFXPanel();;
     private AudioPlayer bgMusic;
     
@@ -67,17 +78,26 @@ public class Game extends Canvas implements Runnable {
         requestFocus();
         addKeyListener(new KeyControl(this));
         try{
-            allEnemysList = new ArrayList<>();
-            player = new Player(100, 100, 7, 100, 100);
-            enemy = new Enemy(400, 600, 1, 150, player);
-            allEnemysList.add(enemy);/*
-            enemy = new Enemy(500, 300, 2, 100, player);
-            allEnemysList.add(enemy);
-            enemy = new Enemy(700, 300, 3, 100, player);
-            allEnemysList.add(enemy);*/
             arena = new Arena((WINDOW_WIDTH), (WINDOW_HEIGHT));
             playerPanel = new PlayerPanel(0, 700, 100, 100, 1, 1, 5, 5, 5);
             progressPanel = new ProgressPanel((int)(WINDOW_WIDTH - (0.2 * WINDOW_WIDTH)), 700, 3);
+            
+            
+            
+            allEnemysList = new ArrayList<>();
+            spawner = new Spawner(10, allEnemysList);
+            player = new Player(100, 100, 7, 100, 100);
+            renderQueue.add(player);
+            
+            /*enemy = new Enemy(400, 600, 1, 150, player);
+            allEnemysList.add(enemy);
+            renderQueue.add(enemy);*/
+            
+            /*enemy = new Enemy(500, 300, 2, 100, player);
+            allEnemysList.add(enemy);
+            enemy = new Enemy(700, 300, 3, 100, player);
+            allEnemysList.add(enemy);*/
+            
             background = ImageIO.read(new File("src/res/world/arenaTiles/bg.png"));
             background = scale(background, 1280, 768);
             
@@ -102,8 +122,6 @@ public class Game extends Canvas implements Runnable {
         running = true;
         thread = new Thread(this);
         thread.start();
-        
-        
     }
     
     private synchronized void stop() {
@@ -150,7 +168,6 @@ public class Game extends Canvas implements Runnable {
             }
 
             if(timer >= 1000000000){
-                //System.out.println("Ticks and Frames: " + ticks);
                 ticks = 0;
                 timer = 0;
             }
@@ -160,9 +177,6 @@ public class Game extends Canvas implements Runnable {
         
     }
     
-        
-    
-    
     private void tick(){
         
         player.tick();
@@ -170,6 +184,15 @@ public class Game extends Canvas implements Runnable {
         
         playerPanel.tick();
         playerPanel.updatePlayerData(player.getHealth(), player.getMana());
+        
+        spawner.tick();
+        /*try{
+            spawner.tick();
+        }catch(EnemySpawnedException e){
+            allEnemysList.add(e.getEnemy());
+            renderQueue.add(e.getEnemy());
+            spawner.setSpawnTimer(1);
+        }*/
         
         for(Enemy e : allEnemysList){
             e.tick(player);
@@ -192,10 +215,14 @@ public class Game extends Canvas implements Runnable {
         try{
             graphics.drawImage(background, 0, 0, getWidth(), getHeight(), this);
             arena.draw(graphics, this);
+            updateRenderQueue();
+            for(Character c : renderQueue){
+                if(c == player)
+                    player.draw(graphics, this, 0);
+                else
+                    c.draw(graphics, this);
+            }
             
-            for(Enemy e : allEnemysList)
-                e.draw(graphics, this);
-            player.draw(graphics, this, 1);
             playerPanel.draw(graphics, this);
             progressPanel.draw(graphics, this);
         }catch(EnemyDiesException e){
@@ -206,6 +233,8 @@ public class Game extends Canvas implements Runnable {
             playerPanel.fireballCooldown();
         }catch(EndOfCastIceBreathException e){
             playerPanel.iceBreathCooldown();
+        }catch(CharacterDiesException e){
+            
         }
         
         
@@ -296,6 +325,28 @@ public class Game extends Canvas implements Runnable {
             graphics2D.dispose();
         }
         return scaledImage;
+    }
+    
+    private void updateRenderQueue(){
+        
+        renderQueue.clear();
+        renderQueue.addAll(allEnemysList);
+        renderQueue.add(player);
+        Collections.sort(renderQueue);
+        
+        /*int i = 0;
+        Character tmp;
+        for(Character c : renderQueue){
+            
+            
+            
+            if(c.getY() > renderQueue.get(i + 1).getY()){
+                tmp = renderQueue.get(i + 1);
+                renderQueue.set(i + 1, c);
+                renderQueue.set(i, tmp);
+            }       
+        }*/
+        
     }
 
     public boolean isRunning() {
