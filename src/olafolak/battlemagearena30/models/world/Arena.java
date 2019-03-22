@@ -271,8 +271,8 @@ public class Arena {
         }
         
         graphics.drawRect(movementArea.x, movementArea.y, movementArea.width, movementArea.height);
-        graphics.drawLine(1250, 350, 1330, 350);
-        
+        //graphics.drawLine(1250, 350, 1330, 350);
+        //graphics.drawLine(352, 700, 352, 800);
     }
     
     

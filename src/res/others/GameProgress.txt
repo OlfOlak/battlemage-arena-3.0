@@ -1,0 +1,10 @@
+@1-4,30
+3*Spearman,1*Firemage,2*Spearman;
+2*Spearman,1*Firemage,4*Spearman,1*Firemage;
+3*Spearman,1*Firemage,5*Spearman
+@2-5,50
+2*Spearman,1*Firemage,5*Spearman;
+1*Firemage,4*Spearman,2*Firemage,3*Spearman;
+
+
+

@@ -3,18 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package olafolak.battlemagearena30.models.game;
+package olafolak.battlemagearena30.models.exceptions;
 
 /**
  *
  * @author OlafPC
  */
-public class SpawnerThread extends Thread implements Runnable{
-    
-    @Override
-    public void run(){
-        while(true)
-            System.out.println("New THREAD");
-    }
+public class WaveEndedException extends Exception{
     
 }

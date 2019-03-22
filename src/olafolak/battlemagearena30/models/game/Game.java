@@ -21,12 +21,14 @@ import olafolak.battlemagearena30.models.characters.Enemy;
 import olafolak.battlemagearena30.models.utilities.KeyControl;
 import olafolak.battlemagearena30.models.characters.Player;
 import olafolak.battlemagearena30.models.characters.Character;
+import olafolak.battlemagearena30.models.characters.FireMage;
 import olafolak.battlemagearena30.models.characters.Spearman;
 import olafolak.battlemagearena30.models.exceptions.CharacterDiesException;
 import olafolak.battlemagearena30.models.exceptions.EndOfMagicShieldException;
 import olafolak.battlemagearena30.models.exceptions.EnemyDiesException;
 import olafolak.battlemagearena30.models.exceptions.EnemySpawnedException;
 import olafolak.battlemagearena30.models.exceptions.PlayerDiesException;
+import olafolak.battlemagearena30.models.exceptions.WaveEndedException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfCastFireballException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfCastIceBreathException;
 import olafolak.battlemagearena30.models.hud.PlayerPanel;
@@ -67,10 +69,10 @@ public class Game extends Canvas implements Runnable {
     private ArrayList<Enemy> belowPlayerRenderQueue;
     
     private Graphics graphics;
-    SpawnerThread spawnerThread;
+    
     final JFXPanel fxPanel = new JFXPanel();;
     private AudioPlayer bgMusic;
-    
+
     public ArrayList<Enemy> allEnemysList;
     
     
@@ -79,23 +81,18 @@ public class Game extends Canvas implements Runnable {
         addKeyListener(new KeyControl(this));
         try{
             arena = new Arena((WINDOW_WIDTH), (WINDOW_HEIGHT));
-            playerPanel = new PlayerPanel(0, 700, 100, 100, 1, 1, 5, 5, 5);
-            progressPanel = new ProgressPanel((int)(WINDOW_WIDTH - (0.2 * WINDOW_WIDTH)), 700, 3);
-            
-            
-            
             allEnemysList = new ArrayList<>();
-            spawner = new Spawner(10, allEnemysList);
+            spawner = new Spawner(7, 30, allEnemysList);
+            playerPanel = new PlayerPanel(0, 700, 100, 100, 1, 1, 5, 5, 5);
+            progressPanel = new ProgressPanel((int)(WINDOW_WIDTH - (0.2 * WINDOW_WIDTH)), 700, 3, spawner.getWaveOverallProgress());
+            
+            
             player = new Player(100, 100, 7, 100, 100);
             renderQueue.add(player);
             
-            /*enemy = new Enemy(400, 600, 1, 150, player);
+            /*enemy = new FireMage(400, 600, 0, 150, player);
             allEnemysList.add(enemy);
-            renderQueue.add(enemy);*/
-            
-            /*enemy = new Enemy(500, 300, 2, 100, player);
-            allEnemysList.add(enemy);
-            enemy = new Enemy(700, 300, 3, 100, player);
+            enemy = new Spearman(700, 300, 0, 150, player);
             allEnemysList.add(enemy);*/
             
             background = ImageIO.read(new File("src/res/world/arenaTiles/bg.png"));
@@ -186,13 +183,13 @@ public class Game extends Canvas implements Runnable {
         playerPanel.updatePlayerData(player.getHealth(), player.getMana());
         
         spawner.tick();
-        /*try{
-            spawner.tick();
-        }catch(EnemySpawnedException e){
-            allEnemysList.add(e.getEnemy());
-            renderQueue.add(e.getEnemy());
-            spawner.setSpawnTimer(1);
-        }*/
+        try{
+            spawner.run();
+        }catch(WaveEndedException e){
+            
+        }
+        
+        
         
         for(Enemy e : allEnemysList){
             e.tick(player);
@@ -227,6 +224,8 @@ public class Game extends Canvas implements Runnable {
             progressPanel.draw(graphics, this);
         }catch(EnemyDiesException e){
             allEnemysList.remove(e.getEnemy());
+            spawner.addProgress(e.getEnemy().getProgressValue());
+            progressPanel.addProgress(e.getEnemy().getProgressValue());
         }catch(PlayerDiesException e){
             player = null;
         }catch(EndOfCastFireballException e){
@@ -328,24 +327,13 @@ public class Game extends Canvas implements Runnable {
     }
     
     private void updateRenderQueue(){
-        
         renderQueue.clear();
         renderQueue.addAll(allEnemysList);
         renderQueue.add(player);
         Collections.sort(renderQueue);
-        
-        /*int i = 0;
-        Character tmp;
-        for(Character c : renderQueue){
-            
-            
-            
-            if(c.getY() > renderQueue.get(i + 1).getY()){
-                tmp = renderQueue.get(i + 1);
-                renderQueue.set(i + 1, c);
-                renderQueue.set(i, tmp);
-            }       
-        }*/
+    }
+    
+    private void nextWave(){
         
     }
 

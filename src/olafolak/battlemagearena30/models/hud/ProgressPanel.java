@@ -25,16 +25,20 @@ public class ProgressPanel {
     private int wavesCount = 1;
     private int wavesMax;
     
+    private int waveProgress = 0;
+    private int waveOverallProgress;
+    
     private Rectangle casing;
     private Rectangle progressBar;
     
     private int width = (int)(0.2 * WINDOW_WIDTH);
     private int height = (int)(0.105 * WINDOW_HEIGHT);
     
-    public ProgressPanel(int x, int y, int wavesMax){
+    public ProgressPanel(int x, int y, int wavesMax, int waveOverallProgress){
         this.x = x;
         this.y = y;
         this.wavesMax = wavesMax;
+        this.waveOverallProgress = waveOverallProgress;
         
         casing = new Rectangle(x, y, width, height);
         progressBar = new Rectangle(x, y, width, (int)(0.4 * height));
@@ -48,11 +52,16 @@ public class ProgressPanel {
         graphics.setFont(new Font("TimesRoman", Font.BOLD, 15));
         graphics.drawString("Wave progress:", x, y + 15);
         graphics.setColor(Color.YELLOW);
-        graphics.fillRect(x, y + 17, width, (int)(0.4 * height));
+        graphics.drawRect(x, y + 17, width, (int)(0.4 * height));
+        graphics.fillRect(x, y + 17, waveProgress * width / waveOverallProgress, (int)(0.4 * height));
         graphics.setColor(Color.WHITE);
         graphics.setFont(new Font("TimesRoman", Font.BOLD, 25));
         graphics.drawString("Waves: " + String.valueOf(wavesCount) + "/" + String.valueOf(wavesMax), x, y + (int)(0.4 * height) + 30 + 13);
         graphics.setColor(Color.BLACK);
+    }
+    
+    public void addProgress(int progress){
+        waveProgress += progress;
     }
     
 }

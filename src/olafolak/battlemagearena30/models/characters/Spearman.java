@@ -8,6 +8,7 @@ package olafolak.battlemagearena30.models.characters;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.io.IOException;
+import olafolak.battlemagearena30.models.ai.PathFinder;
 import olafolak.battlemagearena30.models.animations.AttackAnimation;
 import olafolak.battlemagearena30.models.animations.BloodAnimation;
 import olafolak.battlemagearena30.models.animations.DieAnimation;
@@ -24,6 +25,7 @@ import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfGet
 import olafolak.battlemagearena30.models.game.Game;
 import static olafolak.battlemagearena30.models.game.Game.WINDOW_HEIGHT;
 import static olafolak.battlemagearena30.models.game.Game.WINDOW_WIDTH;
+import olafolak.battlemagearena30.models.game.Spawner;
 import olafolak.battlemagearena30.models.sprites.BoundsBox;
 
 /**
@@ -37,9 +39,13 @@ public class Spearman extends Enemy{
     private int characterHeight = (int)(WINDOW_HEIGHT * 50 / 768);
     private int frameWidth = (int)(1.4 * characterWidth);
     private int frameHeight = (int)(1.4 * characterHeight);
+    private int freezeAnimationWidth = (int)(2.5 * characterWidth);
+    private int freezeAnimationHeight = (int)(2.5 * characterHeight);
     
-    public Spearman(int x, int y, int speed, int health, int spawnPoint, Player player) throws IOException {
-        super(x, y, speed, health, spawnPoint, player);
+    public Spearman(int x, int y, int speed, int health, Player player) throws IOException {
+        super(x, y, speed, health, player);
+        
+        progressValue = 10;
         
         idleAnimation = new IdleAnimation(60, 0.85,
                 getAnimationFrames("src/res/sprites/spearman", "idle_left", 4, frameWidth, frameHeight),
@@ -66,6 +72,19 @@ public class Spearman extends Enemy{
         
     }
     
+    public Spearman(int spawnPoint, int speed, int health, Player player) throws IOException{
+        this(0, 0, speed, health, player);
+        
+        if(spawnPoint == 1){
+            this.x = Spawner.spawnPointOneX - (characterWidth / 2);
+            this.y = Spawner.spawnPointOneY - characterHeight;
+        }else if(spawnPoint == 2){
+            this.x = Spawner.spawnPointTwoX - (characterWidth / 2);
+            this.y = Spawner.spawnPointTwoY - characterHeight;
+        }
+        this.pathFinder = new PathFinder(this, player, spawnPoint);        
+    }
+    /*
     @Override
     public void draw(Graphics graphics, Game observer) throws EnemyDiesException{
          
@@ -95,12 +114,12 @@ public class Spearman extends Enemy{
                 idleAnimation.updateDirection(isHeadedRight);
                 idleAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);
                 idleAnimation.freeze(2);
-                freezeAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);
+                freezeAnimation.run(freezeAnimationWidth, freezeAnimationHeight, graphics, observer);
             }
             else if(isFrozen){
                 idleAnimation.updateDirection(isHeadedRight);
                 idleAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);
-                frozenAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);
+                frozenAnimation.run(freezeAnimationWidth, freezeAnimationHeight, graphics, observer);
                 //System.out.println("Is frozen!");
             }
         }catch(EndOfDieException e){
@@ -113,12 +132,6 @@ public class Spearman extends Enemy{
         }catch(EndOfAttackException e){
             isAttacking = false;
             attackAnimation.reset();
-            
-            /*try{
-                meleeAttackSound = new AudioPlayer("src/res/sounds/soundEffects/combat/swordSwish.wav", false);
-            }catch(Exception ex){
-
-            }*/
         }catch(EndOfBloodException e){
             bloodAnimation.reset();
         }catch(EndOfFreezeException e){
@@ -138,6 +151,6 @@ public class Spearman extends Enemy{
         graphics.fillRect(healthBar.x, healthBar.y, health * healthBarWidth / maxHealth, healthBarHeight);
         graphics.setColor(Color.black);
         
-    }
+    }*/
     
 }

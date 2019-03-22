@@ -10,14 +10,11 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.io.IOException;
 import olafolak.battlemagearena30.models.animations.Animation;
-import olafolak.battlemagearena30.models.animations.AttackAnimation;
 import olafolak.battlemagearena30.models.animations.BloodAnimation;
 import olafolak.battlemagearena30.models.animations.DieAnimation;
 import olafolak.battlemagearena30.models.animations.FreezeAnimation;
 import olafolak.battlemagearena30.models.animations.FrozenAnimation;
 import olafolak.battlemagearena30.models.animations.GetHurtAnimation;
-import olafolak.battlemagearena30.models.animations.IdleAnimation;
-import olafolak.battlemagearena30.models.animations.WalkAnimation;
 import olafolak.battlemagearena30.models.exceptions.EnemyDiesException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfAttackException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfBloodException;
@@ -26,6 +23,7 @@ import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfFre
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfFrozenException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfGetHurtException;
 import olafolak.battlemagearena30.models.game.Game;
+import olafolak.battlemagearena30.models.game.Spawner;
 import olafolak.battlemagearena30.models.utilities.AudioPlayer;
 
 /**
@@ -44,6 +42,7 @@ public class Enemy extends Character implements CharacterInterface{
     protected boolean canAttack = true;
     protected boolean isFreezing = false;
     protected boolean isFrozen = false;
+    protected int progressValue;
     protected PathFinder pathFinder;
     protected int attackTimer = 0;
     protected Player player;
@@ -56,16 +55,19 @@ public class Enemy extends Character implements CharacterInterface{
     // Bounds.
     private int characterWidth = 50;
     private int characterHeight = 50;
-    protected int freezeAnimationWidth = (int)(2.5 * characterWidth);
-    protected int freezeAnimationHeight = (int)(2.5 * characterHeight);
+    private int frameWidth = (int)(1.4 * characterWidth);
+    private int frameHeight = (int)(1.4 * characterHeight);
+    private int freezeAnimationWidth = (int)(2.5 * characterWidth);
+    private int freezeAnimationHeight = (int)(2.5 * characterHeight);
     
     
     
-    public Enemy(int x, int y, int speed, int health, int spawnPoint, Player player) throws IOException {
+    public Enemy(int x, int y, int speed, int health, Player player) throws IOException {
         super(x, y, speed, health);
         
-        pathFinder = new PathFinder(this, player, spawnPoint);
+        this.pathFinder = new PathFinder(this, player, 0);
         this.player = player;
+        this.progressValue = 10;
         isHeadedRight = false;
         /*idleAnimation = new IdleAnimation(60, 0.85,
                 getAnimationFrames("src/res/sprites/w_warrior", "idle_left", 5, characterWidth, characterHeight),
@@ -96,6 +98,19 @@ public class Enemy extends Character implements CharacterInterface{
             
         }
     }
+    
+    public Enemy(int spawnPoint, int speed, int health, Player player) throws IOException{
+        this(0, 0, speed, health, player);
+        
+        if(spawnPoint == 1){
+            this.x = Spawner.spawnPointOneX - (characterWidth / 2);
+            this.y = Spawner.spawnPointOneY - characterHeight;
+        }else if(spawnPoint == 2){
+            this.x = Spawner.spawnPointTwoX - (characterWidth / 2);
+            this.y = Spawner.spawnPointTwoY - characterHeight;
+        }
+        this.pathFinder = new PathFinder(this, player, spawnPoint);        
+    }
 
     @Override
     public void draw(Graphics graphics, Game observer) throws EnemyDiesException{
@@ -103,34 +118,34 @@ public class Enemy extends Character implements CharacterInterface{
         try{
             if(isIdle){
                 idleAnimation.updateDirection(isHeadedRight);
-                idleAnimation.run(x, y, graphics, observer);    
+                idleAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);    
             }
             if(isMoving){
                 walkAnimation.updateDirection(isHeadedRight);
-                walkAnimation.run(x, y, graphics, observer);
+                walkAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);
             }
             if(isAttacking){
                 attackAnimation.updateDirection(isHeadedRight);
-                attackAnimation.run(x, y, graphics, observer);
+                attackAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);
             }
             if(takesDamage){
                 hurtAnimation.updateDirection(isHeadedRight);
-                hurtAnimation.run(x, y, graphics, observer);
-                bloodAnimation.run(x, y, graphics, observer);
+                hurtAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);
+                bloodAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);
             }
             if(isDying){
                 dieAnimation.updateDirection(isHeadedRight);
-                dieAnimation.run(x, y, graphics, observer);
+                dieAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);
             }
             if(isFreezing){
                 idleAnimation.updateDirection(isHeadedRight);
-                idleAnimation.run(x, y, graphics, observer);
+                idleAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);
                 idleAnimation.freeze(2);
                 freezeAnimation.run(x, y, graphics, observer);
             }
             else if(isFrozen){
                 idleAnimation.updateDirection(isHeadedRight);
-                idleAnimation.run(x, y, graphics, observer);
+                idleAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);
                 frozenAnimation.run(x, y, graphics, observer);
                 //System.out.println("Is frozen!");
             }
@@ -447,5 +462,14 @@ public class Enemy extends Character implements CharacterInterface{
     public void setPlayer(Player player) {
         this.player = player;
     }
+
+    public int getProgressValue() {
+        return progressValue;
+    }
+
+    public void setProgressValue(int progressValue) {
+        this.progressValue = progressValue;
+    }
+    
 
 }

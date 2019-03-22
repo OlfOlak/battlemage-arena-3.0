@@ -139,9 +139,7 @@ public class PathFinder {
             default:
                 break;
         }
-        
-        
-        
+            
     }
     
     private void update(){

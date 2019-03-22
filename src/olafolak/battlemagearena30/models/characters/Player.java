@@ -260,7 +260,7 @@ public class Player extends Character implements CharacterInterface{
         checkArenaCollisions();
         updateAnimations();
         //System.out.println("boundsBox.x: " + boundsBox.x + " boundsBox.y: " + boundsBox.y);
-        System.out.println("mana: " + mana);
+        
     }
 
     public void updateEnemysList(ArrayList<Enemy> enemysList){
