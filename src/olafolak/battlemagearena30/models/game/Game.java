@@ -64,6 +64,8 @@ public class Game extends Canvas implements Runnable {
     private PlayerPanel playerPanel;
     private ProgressPanel progressPanel;
     
+    private boolean breakRuns = false;
+    
     private ArrayList<Character> renderQueue = new ArrayList<>();
     private ArrayList<Enemy> abovePlayerRenderQueue;
     private ArrayList<Enemy> belowPlayerRenderQueue;
@@ -82,7 +84,7 @@ public class Game extends Canvas implements Runnable {
         try{
             arena = new Arena((WINDOW_WIDTH), (WINDOW_HEIGHT));
             allEnemysList = new ArrayList<>();
-            spawner = new Spawner(7, 30, allEnemysList);
+            spawner = new Spawner(1, allEnemysList);
             playerPanel = new PlayerPanel(0, 700, 100, 100, 1, 1, 5, 5, 5);
             progressPanel = new ProgressPanel((int)(WINDOW_WIDTH - (0.2 * WINDOW_WIDTH)), 700, 3, spawner.getWaveOverallProgress());
             
@@ -187,6 +189,8 @@ public class Game extends Canvas implements Runnable {
             spawner.run();
         }catch(WaveEndedException e){
             
+            
+            nextWave();
         }
         
         
@@ -334,7 +338,8 @@ public class Game extends Canvas implements Runnable {
     }
     
     private void nextWave(){
-        
+        breakRuns = true;
+        spawner.nextWave();
     }
 
     public boolean isRunning() {

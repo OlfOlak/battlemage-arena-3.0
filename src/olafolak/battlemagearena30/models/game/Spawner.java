@@ -6,6 +6,9 @@
 package olafolak.battlemagearena30.models.game;
 
 import java.awt.List;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -13,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import olafolak.battlemagearena30.models.characters.Enemy;
 import olafolak.battlemagearena30.models.characters.FireMage;
@@ -29,11 +33,15 @@ import static olafolak.battlemagearena30.models.game.Game.WINDOW_WIDTH;
 public class Spawner{
     
     private ArrayList<Enemy> enemysList;
+    private ArrayList<ArrayList<Enemy>> wavesList;
     private ArrayList<Enemy> waveQueue;
     private int waveQueueIterator = 0;
     
     private int spawnTimer = 1;
     private int spawnDelay = 5;
+    
+    private int wave = 1;
+    private int round = 2;
     
     private int waveOverallProgress = 0;
     private int waveProgressLimit;
@@ -49,22 +57,21 @@ public class Spawner{
     public static int spawnPointTwoY = (int)(350 * WINDOW_HEIGHT / 768);
     
     
-    public Spawner(int delay, int progressLimit, ArrayList<Enemy> enemysList){
-        this.spawnDelay = delay;
-        this.waveProgressLimit = progressLimit;
+    public Spawner(int round, ArrayList<Enemy> enemysList){
+        
         this.enemysList = enemysList;
+        waveQueue = new ArrayList<>();
+        
         fillWaveQueue();
         
         for(Enemy e : waveQueue)
             waveOverallProgress += e.getProgressValue();
-        
     }
     
     public void tick(){
         if(spawnTimer != 0)
             spawnTimer++;
-        System.out.println("progressToGain: " + currentProgressToGain);
-        
+        //System.out.println("progressToGain: " + currentProgressToGain);
     }
     
     public void run() throws WaveEndedException{
@@ -85,32 +92,54 @@ public class Spawner{
         }    
     }
     
-    private void fillWaveQueue() throws IOException{
+    private void fillWaveQueue(){
         
-        String[] progressData = (String[]) Files.lines(Paths.get("src/res/others/GameProgress.txt"))
-                .filter(x -> x.contains('@' + String.valueOf(1)))
-                .toArray();
+        ArrayList<String> progressData = new ArrayList<>();
         
+        try{
+            String line;
+            
+            FileReader fileReader = new FileReader("src/res/others/GameProgress.txt");
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            
+            while((line = bufferedReader.readLine()) != null) {
+                if(line.contains("@" + Integer.toString(round)))
+                    progressData.add(line);
+            }  
+            
+        }catch(FileNotFoundException e){
+            System.out.println("GameProgress file not found");
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        
+        int i = 0;
         String[] tmp;
+        String[] tmp2;
+
         
-        int i = 0;        
         for(String s : progressData){
             
-            tmp = progressData[i].split(",");
+            tmp = progressData.get(i).split(",");
             
-            switch(i){
-                case 1:
-                    
-                    break;
+            if(i == 0){
+                spawnDelay = Integer.valueOf(tmp[1]);
+                waveProgressLimit = Integer.valueOf(tmp[2]);
+            }else{
+                
+                if(i == wave){
+                    for(int k = 1; k < tmp.length; k++){
+                        tmp2 = tmp[k].split("-");
+
+                        for(int l = 0; l < Integer.valueOf(tmp2[0]); l++){
+                            waveQueue.add(spawnByStairs(tmp2[1]));
+                        }
+                    }
+                }
             }
-            
-        }    
-                
-                
-                
-        
-        
-        
+            i++;    
+        }  
+
         /*waveQueue = new ArrayList<>();
         waveQueue.add(spawnByStairs(EnemyType.SPEARMAN));
         waveQueue.add(spawnByStairs(EnemyType.SPEARMAN));
@@ -121,18 +150,29 @@ public class Spawner{
         
     }
     
-    private void nextWave(){
+    private EnemyType characterStringToEnum(String input){
         
+        if(input.equals("Spearman"))
+            return EnemyType.SPEARMAN;
+        else if(input.equals("Firemage"))
+            return EnemyType.FIREMAGE;
+        else
+            return null;
     }
     
-    private Enemy spawnByStairs(EnemyType type){
+    public void nextWave(){
+        wave++;
+        fillWaveQueue();
+    }
+    
+    private Enemy spawnByStairs(String input){
         
         try {
             int tmpRand = rand.nextInt(2) + 1;
             
             switch(tmpRand){
                 case 1:
-                    switch(type){
+                    switch(characterStringToEnum(input)){
                         case SPEARMAN:
                             System.out.println("SPEARMAN SPAWNED");
                             return new Spearman(1, 1, 70, Game.player);
@@ -144,7 +184,7 @@ public class Spawner{
                     }
                     break;
                 case 2:
-                    switch(type){
+                    switch(characterStringToEnum(input)){
                         case SPEARMAN:
                             System.out.println("SPEARMAN SPAWNED");
                             return new Spearman(2, 1, 70, Game.player);
