@@ -33,7 +33,9 @@ public class NextWaveCounter {
             timer++;
     }
     
-    public void run(Graphics graphics, Game observer) throws EndOfBreakException{
+    
+    
+    public void run() throws EndOfBreakException{
         
         if(timer == 0)
             timer++;
@@ -47,12 +49,13 @@ public class NextWaveCounter {
             }else
                 timer = 1;    
         }
-        
+    }
+    
+    public void draw(Graphics graphics, Game observer){
         graphics.setFont(new Font("TimesRoman", Font.BOLD, 20));
         graphics.drawString("Next wave starts in:", 400, 200);
         graphics.setFont(new Font("TimesRoman", Font.BOLD, 40));
         graphics.drawString(String.valueOf(counter), 450, 300);
-        
     }
     
 }

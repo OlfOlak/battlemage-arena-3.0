@@ -53,7 +53,11 @@ public class ProgressPanel {
         graphics.drawString("Wave progress:", x, y + 15);
         graphics.setColor(Color.YELLOW);
         graphics.drawRect(x, y + 17, width, (int)(0.4 * height));
-        graphics.fillRect(x, y + 17, waveProgress * width / waveOverallProgress, (int)(0.4 * height));
+        try{
+            graphics.fillRect(x, y + 17, waveProgress * width / waveOverallProgress, (int)(0.4 * height));
+        }catch(Exception e){
+            
+        }
         graphics.setColor(Color.WHITE);
         graphics.setFont(new Font("TimesRoman", Font.BOLD, 25));
         graphics.drawString("Waves: " + String.valueOf(wavesCount) + "/" + String.valueOf(wavesMax), x, y + (int)(0.4 * height) + 30 + 13);
@@ -62,6 +66,12 @@ public class ProgressPanel {
     
     public void addProgress(int progress){
         waveProgress += progress;
+    }
+    
+    public void nextWave(int waveOverallProgress){
+        wavesCount++;
+        waveProgress = 0;
+        this.waveOverallProgress = waveOverallProgress;
     }
     
 }

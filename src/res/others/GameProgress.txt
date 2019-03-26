@@ -1,5 +1,5 @@
 @1,4,30
-@1,3-Spearman,1-Firemage,2-Spearman
+@1,1-Spearman
 @1,2-Spearman,1-Firemage,4-Spearman,1-Firemage
 @1,3-Spearman,1-Firemage,5-Spearman
 @2,5,50

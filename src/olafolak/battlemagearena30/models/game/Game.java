@@ -24,6 +24,7 @@ import olafolak.battlemagearena30.models.characters.Character;
 import olafolak.battlemagearena30.models.characters.FireMage;
 import olafolak.battlemagearena30.models.characters.Spearman;
 import olafolak.battlemagearena30.models.exceptions.CharacterDiesException;
+import olafolak.battlemagearena30.models.exceptions.EndOfBreakException;
 import olafolak.battlemagearena30.models.exceptions.EndOfMagicShieldException;
 import olafolak.battlemagearena30.models.exceptions.EnemyDiesException;
 import olafolak.battlemagearena30.models.exceptions.EnemySpawnedException;
@@ -31,6 +32,7 @@ import olafolak.battlemagearena30.models.exceptions.PlayerDiesException;
 import olafolak.battlemagearena30.models.exceptions.WaveEndedException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfCastFireballException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfCastIceBreathException;
+import olafolak.battlemagearena30.models.hud.NextWaveCounter;
 import olafolak.battlemagearena30.models.hud.PlayerPanel;
 import olafolak.battlemagearena30.models.hud.ProgressPanel;
 import olafolak.battlemagearena30.models.utilities.AudioPlayer;
@@ -63,6 +65,7 @@ public class Game extends Canvas implements Runnable {
     private Arena arena;
     private PlayerPanel playerPanel;
     private ProgressPanel progressPanel;
+    private NextWaveCounter nextWaveCounter;
     
     private boolean breakRuns = false;
     
@@ -87,7 +90,7 @@ public class Game extends Canvas implements Runnable {
             spawner = new Spawner(1, allEnemysList);
             playerPanel = new PlayerPanel(0, 700, 100, 100, 1, 1, 5, 5, 5);
             progressPanel = new ProgressPanel((int)(WINDOW_WIDTH - (0.2 * WINDOW_WIDTH)), 700, 3, spawner.getWaveOverallProgress());
-            
+            nextWaveCounter = new NextWaveCounter(10);
             
             player = new Player(100, 100, 7, 100, 100);
             renderQueue.add(player);
@@ -184,17 +187,30 @@ public class Game extends Canvas implements Runnable {
         playerPanel.tick();
         playerPanel.updatePlayerData(player.getHealth(), player.getMana());
         
-        spawner.tick();
-        try{
-            spawner.run();
-        }catch(WaveEndedException e){
+        if(!breakRuns){
             
+            spawner.tick();
             
-            nextWave();
+            try{
+                spawner.run();
+            }catch(WaveEndedException e){
+                System.out.println("Start of break");
+                nextWave();
+                
+            }
+        }else{
+            nextWaveCounter.tick();
+            
+            try{
+                nextWaveCounter.run();
+            }catch(EndOfBreakException e){
+                System.out.println("End of break");
+                breakRuns = false;
+            }
         }
         
         
-        
+        // TODO: Delete updating with player parameter.
         for(Enemy e : allEnemysList){
             e.tick(player);
         }
@@ -226,6 +242,10 @@ public class Game extends Canvas implements Runnable {
             
             playerPanel.draw(graphics, this);
             progressPanel.draw(graphics, this);
+            
+            if(breakRuns)
+                nextWaveCounter.draw(graphics, this);
+            
         }catch(EnemyDiesException e){
             allEnemysList.remove(e.getEnemy());
             spawner.addProgress(e.getEnemy().getProgressValue());
@@ -338,8 +358,9 @@ public class Game extends Canvas implements Runnable {
     }
     
     private void nextWave(){
-        breakRuns = true;
         spawner.nextWave();
+        progressPanel.nextWave(spawner.getWaveOverallProgress());
+        breakRuns = true;
     }
 
     public boolean isRunning() {

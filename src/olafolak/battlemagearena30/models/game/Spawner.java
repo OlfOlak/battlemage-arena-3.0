@@ -41,7 +41,7 @@ public class Spawner{
     private int spawnDelay = 5;
     
     private int wave = 1;
-    private int round = 2;
+    private int round = 1;
     
     private int waveOverallProgress = 0;
     private int waveProgressLimit;
@@ -61,11 +61,10 @@ public class Spawner{
         
         this.enemysList = enemysList;
         waveQueue = new ArrayList<>();
+        wavesList = new ArrayList<>();
         
         fillWaveQueue();
-        
-        for(Enemy e : waveQueue)
-            waveOverallProgress += e.getProgressValue();
+        loadWaveQueue();
     }
     
     public void tick(){
@@ -96,6 +95,7 @@ public class Spawner{
         
         ArrayList<String> progressData = new ArrayList<>();
         
+        
         try{
             String line;
             
@@ -120,6 +120,7 @@ public class Spawner{
         
         for(String s : progressData){
             
+            
             tmp = progressData.get(i).split(",");
             
             if(i == 0){
@@ -127,7 +128,17 @@ public class Spawner{
                 waveProgressLimit = Integer.valueOf(tmp[2]);
             }else{
                 
-                if(i == wave){
+                wavesList.add(new ArrayList<>());
+                
+                for(int k = 1; k < tmp.length; k++){
+                    tmp2 = tmp[k].split("-");
+
+                    for(int l = 0; l < Integer.valueOf(tmp2[0]); l++){
+                        wavesList.get(i - 1).add(spawnByStairs(tmp2[1]));
+                    }
+                }
+                
+                /*if(i == wave){
                     for(int k = 1; k < tmp.length; k++){
                         tmp2 = tmp[k].split("-");
 
@@ -135,10 +146,10 @@ public class Spawner{
                             waveQueue.add(spawnByStairs(tmp2[1]));
                         }
                     }
-                }
+                }*/
             }
             i++;    
-        }  
+        }
 
         /*waveQueue = new ArrayList<>();
         waveQueue.add(spawnByStairs(EnemyType.SPEARMAN));
@@ -148,6 +159,13 @@ public class Spawner{
         waveQueue.add(spawnByStairs(EnemyType.SPEARMAN));
         waveQueue.add(spawnByStairs(EnemyType.SPEARMAN));*/
         
+    }
+    
+    private void loadWaveQueue(){
+        waveQueue = wavesList.get(wave - 1);
+        
+        for(Enemy e : waveQueue)
+            waveOverallProgress += e.getProgressValue();
     }
     
     private EnemyType characterStringToEnum(String input){
@@ -161,8 +179,15 @@ public class Spawner{
     }
     
     public void nextWave(){
+        waveQueue.clear();
+        waveQueueIterator = 0;
         wave++;
-        fillWaveQueue();
+        waveOverallProgress = 0;
+        currentProgressToGain = 0;
+        currentProgressGained = 0;
+        spawnTimer = 1;
+        loadWaveQueue();
+        
     }
     
     private Enemy spawnByStairs(String input){
