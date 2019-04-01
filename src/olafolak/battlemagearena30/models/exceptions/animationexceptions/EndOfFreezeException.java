@@ -8,8 +8,8 @@ package olafolak.battlemagearena30.models.exceptions.animationexceptions;
 import olafolak.battlemagearena30.models.exceptions.EndSingleAnimationException;
 
 /**
- *
- * @author OlafPC
+ * Exception class for distinguishing the end of freeze animation.
+ * @author OlfOlak
  */
 public class EndOfFreezeException extends EndSingleAnimationException{
     

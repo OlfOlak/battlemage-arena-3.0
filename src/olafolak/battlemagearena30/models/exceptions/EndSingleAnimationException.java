@@ -6,13 +6,9 @@
 package olafolak.battlemagearena30.models.exceptions;
 
 /**
- *
+ * Exception class for distinguishing the end of animation.
  * @author OlafPC
  */
 public class EndSingleAnimationException extends Exception {
-    
-    public EndSingleAnimationException(){
-        
-    }
     
 }

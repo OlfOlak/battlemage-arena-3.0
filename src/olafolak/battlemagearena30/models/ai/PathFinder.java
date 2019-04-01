@@ -7,21 +7,27 @@ package olafolak.battlemagearena30.models.ai;
 
 import java.util.Random;
 import olafolak.battlemagearena30.models.characters.Enemy;
-import olafolak.battlemagearena30.models.characters.Player;
+import olafolak.battlemagearena30.models.game.Game;
 import olafolak.battlemagearena30.models.world.Arena;
 
 /**
- *
- * @author OlafPC
+ * Controls its enemy type subject to move to the player.
+ * @author OlfOlak
  */
 public class PathFinder {
     
+    // FIELDS.
+    /** Subject to control.**/
     private Enemy searcher;
-    private Player player;
+    /** Generates random values.**/
     private Random rand = new Random();
+    /** Which way the searcher will be flanking the player.**/
     private boolean wayOfFlanking;
+    /** Is true if the player's origin is in the area limited by extensions of inner range box side borders.**/
     private boolean playerInYTunnel = false;
+    /** Points which spawned point was the searcher spawned at.**/
     private int spawnPoint = 0;
+    /** Points the position of the player relative to the searcher.**/
     private int state = 0;
     // 0 - start state.
     // 1 - player is on the same X tunnel on the left.
@@ -36,19 +42,27 @@ public class PathFinder {
     // 10 - player is on rightRangeBox Y tunnel up.
     // 11 - player is on rightRangeBox Y tunnel down.
     
-    
-    
-    public PathFinder(Enemy searcher, Player player, int spawnPoint){
+    // CONSTRUCTORS.
+    /**
+     * Basic constructor.
+     * @param searcher reference to enemy type object that is to be controled.
+     * @param spawnPoint sets the spawn point which the searcher was spawned at.
+     */
+    public PathFinder(Enemy searcher, int spawnPoint){
         this.searcher = searcher;
-        this.player = player;
         this.spawnPoint = spawnPoint;
         
         update();     
     }
     
-    public void run(Enemy searcher, Player player){
+    // METHODS.
+    
+    /**
+     * Controls the subject's movement in order to close by the player.
+     */
+    public void run(){
         
-        update(searcher, player);
+        //update(searcher);
         update();
         //searcher.stopMotion();
         
@@ -142,6 +156,9 @@ public class PathFinder {
             
     }
     
+    /**
+     * Sets proper state based on subject's and player's positions.
+     */
     private void update(){
         try{
             // Enemy spawning.
@@ -152,38 +169,38 @@ public class PathFinder {
                     state = 1;
             }else{
                 // Player in the Y tunnel.
-                if(player.getOriginX() >= (searcher.getLeftRangeBox().x + searcher.getLeftRangeBox().width) &&
-                        player.getOriginX() <= searcher.getRightRangeBox().x){
+                if(Game.player.getOriginX() >= (searcher.getLeftRangeBox().x + searcher.getLeftRangeBox().width) &&
+                        Game.player.getOriginX() <= searcher.getRightRangeBox().x){
                     state = 7;
                 }else{
                     // Player in the leftRangeBox Y tunnel.
-                    if(player.getOriginX() > searcher.getLeftRangeBox().x
-                            && player.getOriginX() < (searcher.getLeftRangeBox().x + searcher.getLeftRangeBox().width)){
+                    if(Game.player.getOriginX() > searcher.getLeftRangeBox().x
+                            && Game.player.getOriginX() < (searcher.getLeftRangeBox().x + searcher.getLeftRangeBox().width)){
 
-                        if(player.getOriginY() < searcher.getLeftRangeBox().y)
+                        if(Game.player.getOriginY() < searcher.getLeftRangeBox().y)
                             state = 8;
                         else
                             state = 9; 
                     // Player in the rightRangeBox Y tunnel;
-                    }else if(player.getOriginX() > searcher.getRightRangeBox().x &&
-                            player.getOriginX() < (searcher.getRightRangeBox().x + searcher.getRightRangeBox().width)){
+                    }else if(Game.player.getOriginX() > searcher.getRightRangeBox().x &&
+                            Game.player.getOriginX() < (searcher.getRightRangeBox().x + searcher.getRightRangeBox().width)){
 
-                        if(player.getOriginY() < searcher.getLeftRangeBox().y)
+                        if(Game.player.getOriginY() < searcher.getLeftRangeBox().y)
                             state = 10;
                         else
                             state = 11; 
                     }else{
                         // Player on the right.
-                        if(player.getOriginX() - searcher.getOriginX() > 0){
+                        if(Game.player.getOriginX() - searcher.getOriginX() > 0){
                             // Player in X tunnel on the right.
-                            if(player.getOriginY() < (searcher.getRightRangeBox().y + searcher.getRightRangeBox().height) 
-                                    && player.getOriginY() > searcher.getRightRangeBox().y){
+                            if(Game.player.getOriginY() < (searcher.getRightRangeBox().y + searcher.getRightRangeBox().height) 
+                                    && Game.player.getOriginY() > searcher.getRightRangeBox().y){
                                 state = 2;
                             }  
                             // Player not in X tunnel.
                             else{
                                 // Player in top right.
-                                if(player.getOriginY() < searcher.getRightRangeBox().y){
+                                if(Game.player.getOriginY() < searcher.getRightRangeBox().y){
                                     state = 4;
                                 }
                                 else{
@@ -194,14 +211,14 @@ public class PathFinder {
                         // Player on the left.
                         else{
                             // Player in X tunnel on the left.
-                            if(player.getOriginY() < (searcher.getRightRangeBox().y + searcher.getRightRangeBox().height) 
-                                    && player.getOriginY() > searcher.getRightRangeBox().y){
+                            if(Game.player.getOriginY() < (searcher.getRightRangeBox().y + searcher.getRightRangeBox().height) 
+                                    && Game.player.getOriginY() > searcher.getRightRangeBox().y){
                                 state = 1;
                             }  
                             // Player not in X tunnel.
                             else{
                                 // Player in top left.
-                                if(player.getOriginY() < searcher.getRightRangeBox().y){
+                                if(Game.player.getOriginY() < searcher.getRightRangeBox().y){
                                     state = 3;
                                 }
                                 else{
@@ -222,10 +239,7 @@ public class PathFinder {
         }
     } 
     
-    private void update(Enemy searcher, Player player){
-        this.searcher = searcher;
-        this.player = player;
-    }
     
     
+    // GETTERS AND SETTERS.
 }

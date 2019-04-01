@@ -5,58 +5,77 @@
  */
 package olafolak.battlemagearena30.models.game;
 
-import java.awt.List;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import olafolak.battlemagearena30.models.characters.Enemy;
 import olafolak.battlemagearena30.models.characters.FireMage;
 import olafolak.battlemagearena30.models.characters.Spearman;
-import olafolak.battlemagearena30.models.exceptions.EnemySpawnedException;
 import olafolak.battlemagearena30.models.exceptions.WaveEndedException;
 import static olafolak.battlemagearena30.models.game.Game.WINDOW_HEIGHT;
 import static olafolak.battlemagearena30.models.game.Game.WINDOW_WIDTH;
 
 /**
- *
- * @author OlafPC
+ * Class for generating rounds enemys and distributing them into battle.
+ * @author OlfOlak
  */
 public class Spawner{
     
+    // FIELDS.
+    
+    /** Reference to game's list of enemys. **/
     private ArrayList<Enemy> enemysList;
+    /** List of file generated enemys with including the division into waves. **/
     private ArrayList<ArrayList<Enemy>> wavesList;
+    /** List of enemys to be spawned during current wave. **/
     private ArrayList<Enemy> waveQueue;
+    /** Iterator of wave enemys queue. **/
     private int waveQueueIterator = 0;
     
+    /** Ticking timer for delaying enemy spawning. **/
     private int spawnTimer = 1;
+    /** Delay with which next enemy spawns. **/
     private int spawnDelay = 5;
     
+    /** The number of the current wave. **/
     private int wave = 1;
+    /** The number of the current round**/
     private int round = 1;
     
+    /** Sum of all enemys's progress values in current wave. **/
     private int waveOverallProgress = 0;
+    /** Limit of spawned enemy's progress value. **/
     private int waveProgressLimit;
+    /** Sum of progress values of the currently spawned enemys. **/
     private int currentProgressToGain = 0;
+    /** Sum of progress values of the conquered enemys.**/
     private int currentProgressGained = 0;
     
+    /** Value for generating random values. **/
     private Random rand = new Random();
+    /** Enum of all types of enemys for switching. **/
     private enum EnemyType {SPEARMAN, FIREMAGE}; 
     
+    /** The X position of spawn point number one. **/
     public static int spawnPointOneX = (int)(352 * WINDOW_WIDTH / 1280);
+    /** The Y position of spawn point number one. **/
     public static int spawnPointOneY = (int)(WINDOW_HEIGHT + 0.4 * WINDOW_HEIGHT);
+    /** The X position of spawn point number two. **/
     public static int spawnPointTwoX = (int)(WINDOW_WIDTH + 0.2 * WINDOW_WIDTH);
+    /** The Y position of spawn point number two. **/
     public static int spawnPointTwoY = (int)(350 * WINDOW_HEIGHT / 768);
     
-    
+    // CONSTRUCTORS.
+    /**
+     * Basic constructor.
+     * @param round indicates which rounds enemys should be generated.
+     * @param enemysList reference to games list of spawned enemys.
+     */
     public Spawner(int round, ArrayList<Enemy> enemysList){
         
         this.enemysList = enemysList;
@@ -67,12 +86,21 @@ public class Spawner{
         loadWaveQueue();
     }
     
+    // METHODS.
+    
+    /**
+     * Clocking method for updating spawner's data.
+     */
     public void tick(){
         if(spawnTimer != 0)
-            spawnTimer++;
+            spawnTimer++; 
         //System.out.println("progressToGain: " + currentProgressToGain);
     }
     
+    /**
+     * Run method for calculating the possibility spawning enemies and passing them to the list of spawned enemys.
+     * @throws WaveEndedException when the wave ends.
+     */
     public void run() throws WaveEndedException{
         
         if(waveQueueIterator < waveQueue.size()){
@@ -91,6 +119,9 @@ public class Spawner{
         }    
     }
     
+    /**
+     * Method that fills current round's enemys list by generating enemys objects based on the wave programming file (GameProgress.txt).
+     */
     private void fillWaveQueue(){
         
         ArrayList<String> progressData = new ArrayList<>();
@@ -137,30 +168,14 @@ public class Spawner{
                         wavesList.get(i - 1).add(spawnByStairs(tmp2[1]));
                     }
                 }
-                
-                /*if(i == wave){
-                    for(int k = 1; k < tmp.length; k++){
-                        tmp2 = tmp[k].split("-");
-
-                        for(int l = 0; l < Integer.valueOf(tmp2[0]); l++){
-                            waveQueue.add(spawnByStairs(tmp2[1]));
-                        }
-                    }
-                }*/
             }
             i++;    
         }
-
-        /*waveQueue = new ArrayList<>();
-        waveQueue.add(spawnByStairs(EnemyType.SPEARMAN));
-        waveQueue.add(spawnByStairs(EnemyType.SPEARMAN));
-        waveQueue.add(spawnByStairs(EnemyType.FIREMAGE));
-        waveQueue.add(spawnByStairs(EnemyType.SPEARMAN));
-        waveQueue.add(spawnByStairs(EnemyType.SPEARMAN));
-        waveQueue.add(spawnByStairs(EnemyType.SPEARMAN));*/
-        
     }
     
+    /**
+     * Method for loading the current wave's enemys queue.
+     */
     private void loadWaveQueue(){
         waveQueue = wavesList.get(wave - 1);
         
@@ -168,6 +183,11 @@ public class Spawner{
             waveOverallProgress += e.getProgressValue();
     }
     
+    /**
+     * Method converting enemy's type string input into enum type.
+     * @param input string representation of enemy type.
+     * @return null if input not recognized, otherwise enum representation of enemy type.
+     */
     private EnemyType characterStringToEnum(String input){
         
         if(input.equals("Spearman"))
@@ -178,6 +198,9 @@ public class Spawner{
             return null;
     }
     
+    /**
+     * Method for the spawner for next wave by loading new enemys queue list and reseting progress indicators.
+     */
     public void nextWave(){
         waveQueue.clear();
         waveQueueIterator = 0;
@@ -186,10 +209,14 @@ public class Spawner{
         currentProgressToGain = 0;
         currentProgressGained = 0;
         spawnTimer = 1;
-        loadWaveQueue();
-        
+        loadWaveQueue();    
     }
     
+    /**
+     * Generates chosen enemy in one of the two stairs spawn points.
+     * @param input string representation of enemy to spawn.
+     * @return initiated enemy object.
+     */
     private Enemy spawnByStairs(String input){
         
         try {
@@ -200,23 +227,23 @@ public class Spawner{
                     switch(characterStringToEnum(input)){
                         case SPEARMAN:
                             System.out.println("SPEARMAN SPAWNED");
-                            return new Spearman(1, 1, 70, Game.player);
+                            return new Spearman(1, 1, 70);
                             //break;
                         case FIREMAGE:
                             System.out.println("FIREMAGE SPAWNED");
-                            return new FireMage(1, 1, 70, Game.player);
-                            //break;
+                            return new FireMage(1, 1, 70);
+                            //break;    
                     }
                     break;
                 case 2:
                     switch(characterStringToEnum(input)){
                         case SPEARMAN:
                             System.out.println("SPEARMAN SPAWNED");
-                            return new Spearman(2, 1, 70, Game.player);
+                            return new Spearman(2, 1, 70);
                             //break;
                         case FIREMAGE:
                             System.out.println("FIREMAGE SPAWNED");
-                            return new FireMage(2, 1, 70, Game.player);
+                            return new FireMage(2, 1, 70);
                             //break;
                     }
                     break;
@@ -233,11 +260,16 @@ public class Spawner{
         return null;
     }
     
+    /**
+     * Adds up progress value of defeated enemy.
+     * @param progress defeated enemy's progress value.
+     */
     public void addProgress(int progress){
         currentProgressGained += progress;
         currentProgressToGain -= progress;
     }
 
+    // SETTERS AND GETTERS.
     public int getSpawnTimer() {
         return spawnTimer;
     }

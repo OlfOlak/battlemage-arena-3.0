@@ -8,13 +8,9 @@ package olafolak.battlemagearena30.models.exceptions.animationexceptions;
 import olafolak.battlemagearena30.models.exceptions.EndSingleAnimationException;
 
 /**
- *
- * @author OlafPC
+ * Exception class for distinguishing the of fireball casting animation.
+ * @author OlfOlak
  */
 public class EndOfCastFireballException extends EndSingleAnimationException{
-    
-    public EndOfCastFireballException(){
-        
-    }
-    
+     
 }

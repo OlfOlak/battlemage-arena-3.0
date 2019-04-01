@@ -6,13 +6,9 @@
 package olafolak.battlemagearena30.models.exceptions;
 
 /**
- *
- * @author OlafPC
+ * Exception class for distinguishing the end of ice breath spell.
+ * @author OlfOlak
  */
 public class EndOfIceBreathException extends Exception{
-    
-    public EndOfIceBreathException(){
-        
-    }
     
 }

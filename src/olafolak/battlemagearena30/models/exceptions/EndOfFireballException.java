@@ -8,17 +8,26 @@ package olafolak.battlemagearena30.models.exceptions;
 import olafolak.battlemagearena30.models.effects.Fireball;
 
 /**
- *
- * @author OlafPC
+ * Exception class for distinguishing the end of fireball spell.
+ * @author OlfOlak
  */
 public class EndOfFireballException extends Exception{
     
+    // FIELDS.
+    /** Stores specific fireball object.**/
     private Fireball fireball;
     
+    // CONSTRUCTORS.
+    /**
+     * Basic constructor for carrying the reference of specific fireball objects.
+     * @param fireball reference to specific fireball object.
+     */
     public EndOfFireballException(Fireball fireball){
         this.fireball = fireball;
     }
 
+    // SETTERS AND GETTERS.
+    
     public Fireball getFireball() {
         return fireball;
     }

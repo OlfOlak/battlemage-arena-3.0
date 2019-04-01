@@ -12,12 +12,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
-import olafolak.battlemagearena30.models.characters.Player;
 import static olafolak.battlemagearena30.models.characters.Player.scale;
 import olafolak.battlemagearena30.models.game.Game;
 import static olafolak.battlemagearena30.models.game.Game.WINDOW_HEIGHT;
@@ -25,55 +20,105 @@ import static olafolak.battlemagearena30.models.game.Game.WINDOW_WIDTH;
 import olafolak.battlemagearena30.models.utilities.AudioPlayer;
 
 /**
- *
- * @author OlafPC
+ * Describes the hud element that shows player's health, mana and avaiable spells.
+ * @author OlfOlak
  */
 public class PlayerPanel {
     
+    // FIELDS.
+    /** The x position of the panel on screen.**/
     private int x;
+    /** The y position of the panel on screen.**/
     private int y;
+    /** The x position of the center of the panel on screen.**/
     private int originX;
+    /** The y position of the center of the panel on screen.**/
     private int originY;
     
+    /** Stores current amount of player's health.**/
     private int health;
+    /** Stores current amount of player's mana.**/
     private int mana;
+    /** Stores the maximum amount of player's health.**/
     private int maxHealth;
+    /** Stores the maximum amount of player's mana.**/
     private int maxMana;
+    /** Stores current amount of health potions on player.**/
     private int healthPotionCount;
+    /** Stores current amount of mana potions on player.**/
     private int manaPotionCount;
     
+    /** Indicates if magic shield spell is cooling down (is avaiable to use).**/
     private boolean magicShieldCooldowns = false;
+    /** Indicates if fireball spell is cooling down (is avaiable to use).**/
     private boolean fireballCooldowns = false;
+    /** Indicates if ice breath spell is cooling down (is avaiable to use).**/
     private boolean iceBreathCooldowns = false;
     
+    /** Ticks timer for magic shield spell.**/
     private int magicShieldTimer = 0;
+    /** Number of seconds the magic shield cooldowns.**/
     private int magicShieldCooldown;
+    /** Tick timer for magic shield spell's cooldown.**/
     private int magicShieldCooldownTimer = 0;
+    /** Ticks timer for fireball spell.**/
     private int fireballTimer = 0;
+    /** Number of seconds the fireball cooldowns.**/
     private int fireballCooldown;
+    /** Tick timer for fireball spell's cooldown.**/
     private int fireballCooldownTimer = 0;
+    /** Ticks timer ice breath spell.**/
     private int iceBreathTimer = 0;
+    /** Number of seconds the ice breath spell cooldowns.**/
     private int iceBreathCooldown;
+    /** Tick timer for ice breath spell's cooldown.**/
     private int iceBreathCooldownTimer = 0;
     
+    /** Keeps the bounds of the whole panel.**/
     private Rectangle casing;
+    /** Keeps the bounds of the health bar.**/
     private Rectangle healthBar;
+    /** Keeps the bounds of the mana bar.**/
     private Rectangle manaBar;
+    /** Keeps the bounds of the magic shield spell's icon.**/
     private Rectangle magicShieldIconShadow;
+    /** Keeps the bounds of the fireball spell's icon.**/
     private Rectangle fireballIconShadow;
+    /** Keeps the bounds of the ice breath spell's icon.**/
     private Rectangle iceBreathIconShadow;
     
+    /** Keeps the image of the magic shield spell's icon.**/
     private BufferedImage magicShieldIcon;
+    /** Keeps the image of the fireball spell's icon.**/
     private BufferedImage fireballIcon;
+    /** Keeps the image of the ice breath spell's icon.**/
     private BufferedImage iceBreathIcon;
+    /** Keeps the image of the health potion action's icon.**/
     private BufferedImage healthPotionIcon;
+    /** Keeps the image of the mana potion action's icon.**/
     private BufferedImage manaPotionIcon;
     
+    /** Playes the potion drinking sound.**/
     private AudioPlayer drinkSound;
     
+    /** The width of the whole panel on screen.**/
     private int width = (int)(0.2 * WINDOW_WIDTH);
+    /** The height of the whole panel on screen.**/
     private int height = (int)(0.105 * WINDOW_HEIGHT);
     
+    // CONSTRUCTORS.
+    /**
+     * Basic constructor.
+     * @param x sets the x position of panel.
+     * @param y sets the y position of panel.
+     * @param health sets the initial amount of player's health.
+     * @param mana sets the initial amount of player's mana.
+     * @param healthPotionCount sets the initial amount of health potions.
+     * @param manaPotionCount sets the initial amount of mana potions.
+     * @param shieldCooldown sets the cooldown of magic shield.
+     * @param fireballCooldown sets the cooldown of fireball spell.
+     * @param icebreathCooldown sets the cooldown of ice breath spell.
+     */
     public PlayerPanel(int x,
             int y,
             int health,
@@ -135,6 +180,12 @@ public class PlayerPanel {
         iceBreathIconShadow = new Rectangle(x, y + (int)(0.5 * height), iceBreathIcon.getWidth(), iceBreathIcon.getHeight());  
     }
     
+    // METHODS.
+    /**
+     * Draws all elements of panel on screen.
+     * @param graphics target graphics to be drawed on.
+     * @param observer context of the drawed graphics.
+     */
     public void draw(Graphics graphics, Game observer){
         
         graphics.setColor(Color.BLACK);
@@ -207,6 +258,9 @@ public class PlayerPanel {
         graphics.setColor(Color.BLACK);
     }
     
+    /**
+     * Clocking method for updating the timers and managing cooldowns.
+     */
     public void tick(){
         if(magicShieldTimer == (magicShieldCooldown * 60)){
             magicShieldTimer = 0;
@@ -244,21 +298,34 @@ public class PlayerPanel {
         }    
     }
     
+    /**
+     * Starts cooldown of magic shield spell.
+     */
     public void magicShieldCooldown(){
         magicShieldCooldowns = true;
         magicShieldTimer = 1;
     }
     
+    /**
+     * Starts cooldown of fireball spell.
+     */
     public void fireballCooldown(){
         fireballCooldowns = true;
         fireballTimer = 1;
     }
     
+    /**
+     * Starts cooldown of ice breath spell.
+     */
     public void iceBreathCooldown(){
         iceBreathCooldowns= true;
         iceBreathTimer = 1;
     }
     
+    /**
+     * Deincrements health potion count if there are any avaiable.
+     * @return true if there was at least 1 potion, false otherwise.
+     */
     public boolean drinkHealthPotion(){
         
         if(healthPotionCount == 0)
@@ -270,6 +337,10 @@ public class PlayerPanel {
         }
     }
     
+    /**
+     * Deincrements mana potion count if there are any avaiable.
+     * @return true if there was at least 1 potion, false otherwise.
+     */
     public boolean drinkManaPotion(){
         
         if(manaPotionCount == 0)
@@ -281,12 +352,17 @@ public class PlayerPanel {
         }
     }
     
+    /**
+     * Updates players health and mana data.
+     * @param health sets new amount of health.
+     * @param mana sets new amount of mana.
+     */
     public void updatePlayerData(int health, int mana){
         this.health = health;
         this.mana = mana;
     }
     
-    // Setters and getters.
+    // SETTERS AND GETTERS.
 
     public int getHealthPotionCount() {
         return healthPotionCount;

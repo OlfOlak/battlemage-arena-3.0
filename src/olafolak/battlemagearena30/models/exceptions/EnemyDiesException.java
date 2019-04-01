@@ -11,17 +11,26 @@ import olafolak.battlemagearena30.models.exceptions.CharacterDiesException;
 
 
 /**
- *
- * @author OlafPC
+ * Exception class for distinguishing the death of enemy typed object.
+ * @author OlfOlak
  */
 public class EnemyDiesException extends CharacterDiesException {
     
+    // FIELDS.
+    /** Stores the reference to enemy object.**/
     private Enemy enemy;
     
+    // CONSTRUCTORS.
+    /**
+     * Basic constructor for carrying the reference of specific enemy objects.
+     * @param enemy reference to specific enemy object.
+     */
     public EnemyDiesException(Enemy enemy){
         this.enemy = enemy;
     }
 
+    // SETTERS AND GETTERS.
+    
     public Enemy getEnemy() {
         return enemy;
     }
@@ -30,8 +39,4 @@ public class EnemyDiesException extends CharacterDiesException {
         this.enemy = enemy;
     }
 
-    
-    
-    
-    
 }

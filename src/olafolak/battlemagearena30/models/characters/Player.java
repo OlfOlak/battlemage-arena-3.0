@@ -25,70 +25,110 @@ import olafolak.battlemagearena30.models.game.Game;
 import static olafolak.battlemagearena30.models.game.Game.WINDOW_HEIGHT;
 import static olafolak.battlemagearena30.models.game.Game.WINDOW_WIDTH;
 import olafolak.battlemagearena30.models.utilities.AudioPlayer;
-import static olafolak.battlemagearena30.models.world.Arena.movementArea;
-
 
 /**
- *
- * @author OlafPC
+ * Player class for extending the character class by functionality characteristic for player.
+ * @author OlfOlak
  */
 public class Player extends Character implements CharacterInterface{
     
+    // FIELDS.
     // Technical fields.
+    /** Stores animation of magic shield action.**/
     private Animation magicShieldAnimation;
+    /** Stores animation of magic shield absorbtion action.**/
     private MagicShieldAbsorbAnimation magicShieldAbsorbAnimation;
+    /** Stores animation of casting fireball action.**/
     private CastFireballAnimation castFireballAnimation;
+    /** Stores animation of casting ice breath action.**/
     private CastIceBreathAnimation castIceBreathAnimation;
-    private IdleAnimation idleAnimation;
-    private WalkAnimation walkAnimation;
-    private AttackAnimation attackAnimation;
+    /** Stores animation of taking damage action.**/
     private GetHurtAnimation hurtAnimation;
+    /** Stores animation of death action.**/
     private DieAnimation dieAnimation;
+    /** Stores blood effet animation.**/
     private BloodAnimation bloodAnimation;
     
+    /** Plays casting spell sound.**/
     private AudioPlayer castSound;
+    /** Plays sword swish sound.**/
     private AudioPlayer swordAttackSound;
+    /** Plays taking damage sound.**/
     private AudioPlayer hurtSound;
+    /** Plays magic shield on sound.**/
     private AudioPlayer magicShieldSound;
+    /** Plays magic shield absorbsion sound.**/
     private AudioPlayer magicShieldAbsorbSound;
+    /** Plays walking sound.**/
     private AudioPlayer walkSound;
     
     
+    /** Indicates if magic shield is on.**/
     private boolean magicShieldOn = false;
+    /** Indicates if magic shield is absorbing damage.**/
     private boolean shieldAbsorbsDamage = false;
+    /** Indicates if character is casting fireball spell.**/
     private boolean castsFireball = false;
+    /** Indicates if character is throwing fireball.**/
     private boolean throwsFireball = false;
+    /** Indicates if character is casting ice breath spell.**/
     private boolean castsIceBreath = false;
+    /** Indicates if character is firing ice breath.**/
     private boolean firesIceBreath = false;
     
+    /** List of currently casted and flying fireball in game.**/
     private ArrayList<Fireball> fireballsList;
+    /** References currently fired ice breath spell.**/
     private IceBreath iceBreath;
     
+    /** Liast of enemys currently in the game.**/
     private ArrayList<Enemy> enemysList;
     
-    private int width = 100;
-    private int height = 100;
-    
     // Attribute fields.
+    /** Current amount of player's mana.**/
     private int mana;
+    /** Maximum amount of player's mana.**/
     private int maxMana;
     
     // Bounds.
+    /** The width of the visual representation.**/
     public static int characterWidth = (int)(WINDOW_WIDTH * 50 / 1280);
+    /** The height of the visual representation.**/
     public static int characterHeight = (int)(WINDOW_HEIGHT * 50 / 768);
+    /** The width of the magic shields spell's visual representation.**/
     private int magicShieldWidth = (int)(4.2 * characterWidth);
+    /** The height of the magic shields spell's visual representation.**/
     private int magicShieldHeight = (int)(4.12 * characterHeight);
+    /** The width of the magic shields absorbtion's visual representation.**/
     private int magicShieldAbsorbWidth = (int)(4.26 * characterWidth);
+    /** The height of the magic shields absorbtion's visual representation.**/
     private int magicShieldAbsorbHeight = (int)(4.12 * characterHeight);
+    /** The width of the fireball cast's visual representation.**/
     private int castFireballWidth = (int)(1.5 * characterWidth);
+    /** The height of the fireball cast's visual representation.**/
     private int castFireballHeight = (int)(1.5 * characterHeight);
+    /** The width of the ice breath cast's visual representation.**/
     private int castIceBreathWidth = (int)(1.5 * characterWidth);
+    /** The height of the ice breath cast's visual representation.**/
     private int castIceBreathHeight = (int)(1.5 * characterHeight);
+    /** The x position of ice breath spell's visual representation if character headed right.**/
     private int iceBreathRightPositionX = (int)(0.05 * characterWidth);
+    /** The x position of ice breath spell's visual representation if character headed left.**/
     private int iceBreathLeftPositionX = (int)(0.95 * characterWidth);
+    /** The y position of ice breath spells's visual representation.**/
     private int iceBreathPositionY = (int)(0.4 * characterHeight);
     
-    // Constructors.
+    // CONSTRUCTORS.
+    
+    /**
+     * Basic constructor.
+     * @param x sets the x position of the visual representation.
+     * @param y sets the y position of the visual representation.
+     * @param speed sets the speed of the character.
+     * @param health sets the maximum amount of health of the character.
+     * @param mana sets the maximum amount of mana of the character.
+     * @throws IOException if there is problem with reading animation files.
+     */
     public Player(int x, int y, int speed, int health, int mana) throws IOException{
         super(x, y, speed, health);
         this.mana = mana;
@@ -139,16 +179,18 @@ public class Player extends Character implements CharacterInterface{
 
     
 
-    
+    // METHODS.
 
-    // Methods.
-    @Override 
-    public void draw(Graphics graphics, Game observer) throws PlayerDiesException{
-        
-    }
-    
-    
-    public void draw(Graphics graphics, Game observer, int i)
+    /**
+     * Overriden drawing method that switches animations and runs them.
+     * @param graphics target graphics to be drawed on.
+     * @param observer context of the drawed graphics.
+     * @throws PlayerDiesException when the player dies.
+     * @throws EndOfCastFireballException when the player ends fireball casting action.
+     * @throws EndOfCastIceBreathException when the player ends ice breath casting action.
+     */
+    @Override
+    public void draw(Graphics graphics, Game observer) 
             throws PlayerDiesException,
             EndOfCastFireballException,
             EndOfCastIceBreathException{
@@ -253,6 +295,9 @@ public class Player extends Character implements CharacterInterface{
         
     }
     
+    /**
+     * Clocking method for updating enemys data.
+     */
     @Override
     public void tick(){
         updateMovement();
@@ -263,10 +308,17 @@ public class Player extends Character implements CharacterInterface{
         
     }
 
+    /**
+     * Updates current list of enemy objects in game.
+     * @param enemysList input list for update.
+     */
     public void updateEnemysList(ArrayList<Enemy> enemysList){
         this.enemysList = enemysList;
     }
     
+    /**
+     * Controls movement depending on action variables and pdates movement and action flags.
+     */
     protected void updateMovement(){
         
         if(!isDying){
@@ -275,7 +327,6 @@ public class Player extends Character implements CharacterInterface{
                     if(!isAttacking){
 
                         if(!movesLeft && !movesRight && !movesUp && !movesDown){
-                            animState = 0;
                             isIdle = true;
                             isMoving = false;
                             
@@ -288,37 +339,28 @@ public class Player extends Character implements CharacterInterface{
                                 x -= speed;
                                 canGoRight = true;
                                 isHeadedRight = false;
-                                animState = 1;
                             }
                             if(movesRight && canGoRight){
                                 x += speed;
                                 canGoLeft = true;
                                 isHeadedRight = true;
-                                animState = 1;
                             }
                             if(movesUp && canGoUp){
                                 y -= speed;
                                 canGoDown = true;
-                                animState = 1;
                             }
                             if(movesDown && canGoDown){
                                 y += speed;
                                 canGoUp = true;
-                                animState = 1;
-                            }
-                            
-                            
-                            
+                            }    
                         }
                     }
                     else{
-                        animState = 2;
                         isIdle = false;
                         isMoving = false;
                     }
                 }
             else{
-                animState = 3;
                 isAttacking = false;
                 isMoving = false;
             }
@@ -336,8 +378,6 @@ public class Player extends Character implements CharacterInterface{
             takesDamage = false;
             isIdle = false;
             isMoving = false;
-
-            animState = 4;
         }
         
         if(walkSound != null){
@@ -351,6 +391,9 @@ public class Player extends Character implements CharacterInterface{
         
     }
     
+    /**
+     * Clocks animations.
+     */
     private void updateAnimations(){
         
         idleAnimation.incrementTicks();
@@ -391,13 +434,18 @@ public class Player extends Character implements CharacterInterface{
         
     }
     
+    /**
+     * Brings up the attack action procedure.
+     * Sets the attack action flage and plays attack sound.
+     */
     public void attack(){
         isAttacking = true;
-        
         swordAttackSound.getClip().loop(1);
-        
     }
     
+    /**
+     * Seeks the enemys in range and deals them damage.
+     */
     private void dealDamage(){
         try{
             ArrayList<Enemy> attackedList = new ArrayList<>();
@@ -412,6 +460,10 @@ public class Player extends Character implements CharacterInterface{
         }
     }
     
+    /**
+     * Decreases health by received damage and checks if enemy is not to be dead.
+     * @param damage amount of health to be decreased by.
+     */
     public void takeDamage(int damage){
         
         if(magicShieldOn == false){
@@ -433,6 +485,10 @@ public class Player extends Character implements CharacterInterface{
         }
     }
     
+    /**
+     * Restores player's health after taking the health potion.
+     * @param restoration amount of health to be restored.
+     */
     public void restoreHealth(int restoration){
         if((maxHealth - health) < restoration)
             health = maxHealth;
@@ -440,6 +496,10 @@ public class Player extends Character implements CharacterInterface{
             health += restoration;
     }
     
+    /**
+     * Restores player's mana after taking the health potion.
+     * @param restoration amount of mana to be restored.
+     */
     public void restoreMana(int restoration){
         if((maxMana - mana) < restoration)
             mana = maxMana;
@@ -447,6 +507,11 @@ public class Player extends Character implements CharacterInterface{
             mana += restoration;
     }
     
+    /**
+     * Brings up the procedure of setting up or dropping the magic shield.
+     * Sets magic shield flag and plays proper audio.
+     * @throws EndOfMagicShieldException if magic shield was dropped.
+     */
     public void setupMagicShield() throws EndOfMagicShieldException{
         
         if(!magicShieldOn){
@@ -461,6 +526,12 @@ public class Player extends Character implements CharacterInterface{
 
     }
     
+    /**
+     * Locks player's movement.
+     * Sets proper flags on.
+     * Decreases player's mana.
+     * Plays casting sound.
+     */
     public void throwFireball(){
         stopMovement();
         isLocked = true;
@@ -471,6 +542,12 @@ public class Player extends Character implements CharacterInterface{
         
     }
     
+    /**
+     * Locks player's movement.
+     * Sets proper flags on.
+     * Decreases player's mana.
+     * Plays casting sound.
+     */
     public void iceBreath(){
         stopMovement();
         isLocked = true;
@@ -480,6 +557,9 @@ public class Player extends Character implements CharacterInterface{
         castSound.getClip().loop(1);
     }
     
+    /**
+     * Initializes new fireball object and adds it to fireballs list.
+     */
     private void generateFireball(){
         try{
             fireballsList.add(new Fireball(originX, originY, 500, isHeadedRight, enemysList));
@@ -489,6 +569,9 @@ public class Player extends Character implements CharacterInterface{
         }
     }
     
+    /**
+     * Initializes new ice breath object.
+     */
     private void generateIceBreath(){
         try{
             if(isHeadedRight)
@@ -501,6 +584,11 @@ public class Player extends Character implements CharacterInterface{
         }
     }
     
+    /**
+     * Runs through the in game enemys list and checks if any contains in player's range box.
+     * @param allEnemysList list of all enemy objects in game.
+     * @return list of enemys that contain in range box.
+     */
     private ArrayList<Enemy> seekForCharactersInRange(ArrayList<Enemy> allEnemysList){
         
         ArrayList<Enemy> tmp = new ArrayList<>();
@@ -524,6 +612,13 @@ public class Player extends Character implements CharacterInterface{
         
     }
     
+    /**
+     * Scales the input image to input dimensions.
+     * @param imageToScale the image to be scaled.
+     * @param dWidth the width of the output image.
+     * @param dHeight the height of the output image.
+     * @return scaled image.
+     */
     public static BufferedImage scale(BufferedImage imageToScale, int dWidth, int dHeight) {
         BufferedImage scaledImage = null;
         if (imageToScale != null) {
@@ -535,9 +630,7 @@ public class Player extends Character implements CharacterInterface{
         return scaledImage;
     }
     
-    
-    
-    // Setters and getters.
+    // SETTERS AND GETTERS.
 
     public int getMana() {
         return mana;

@@ -6,8 +6,8 @@
 package olafolak.battlemagearena30.models.exceptions;
 
 /**
- *
- * @author OlafPC
+ * Exception class for distinguishing the event of character's death.
+ * @author OlfOlak
  */
 public class CharacterDiesException extends Exception{
     

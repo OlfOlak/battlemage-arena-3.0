@@ -5,8 +5,7 @@
  */
 package olafolak.battlemagearena30.models.characters;
 
-import java.awt.Color;
-import java.awt.Graphics;
+
 import java.io.IOException;
 import olafolak.battlemagearena30.models.ai.PathFinder;
 import olafolak.battlemagearena30.models.animations.AttackAnimation;
@@ -15,35 +14,43 @@ import olafolak.battlemagearena30.models.animations.DieAnimation;
 import olafolak.battlemagearena30.models.animations.GetHurtAnimation;
 import olafolak.battlemagearena30.models.animations.IdleAnimation;
 import olafolak.battlemagearena30.models.animations.WalkAnimation;
-import olafolak.battlemagearena30.models.exceptions.EnemyDiesException;
-import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfAttackException;
-import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfBloodException;
-import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfDieException;
-import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfFreezeException;
-import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfFrozenException;
-import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfGetHurtException;
-import olafolak.battlemagearena30.models.game.Game;
 import static olafolak.battlemagearena30.models.game.Game.WINDOW_HEIGHT;
 import static olafolak.battlemagearena30.models.game.Game.WINDOW_WIDTH;
 import olafolak.battlemagearena30.models.game.Spawner;
 import olafolak.battlemagearena30.models.sprites.BoundsBox;
 
 /**
- *
- * @author OlafPC
+ * Extends enemy class with characteristic elements of the spearman enemy type.
+ * @author OlfOlak
  */
 public class Spearman extends Enemy{
     
+    // FIELDS.
     
+    /** The width of the visual representation.**/
     private int characterWidth = (int)(WINDOW_WIDTH * 50 / 1280);
+    /** The height of the visual representation.**/
     private int characterHeight = (int)(WINDOW_HEIGHT * 50 / 768);
+    /** The width of the basic animations' frames.**/
     private int frameWidth = (int)(1.4 * characterWidth);
+    /** The height of the basic animations' frames.**/
     private int frameHeight = (int)(1.4 * characterHeight);
+    /** The width of the freeze animation frames.**/
     private int freezeAnimationWidth = (int)(2.5 * characterWidth);
+    /** The height of the freeze animation frames.**/
     private int freezeAnimationHeight = (int)(2.5 * characterHeight);
     
-    public Spearman(int x, int y, int speed, int health, Player player) throws IOException {
-        super(x, y, speed, health, player);
+    // CONSTRUCTORS.
+    /**
+     * Basic constructor.
+     * @param x sets the x position of the visual representation.
+     * @param y sets the y position of the visual representation.
+     * @param speed sets the speed of the character.
+     * @param health sets amount of maximum health of the character.
+     * @throws IOException if there is problem with reading animation files.
+     */
+    public Spearman(int x, int y, int speed, int health) throws IOException {
+        super(x, y, speed, health);
         
         progressValue = 10;
         
@@ -72,8 +79,15 @@ public class Spearman extends Enemy{
         
     }
     
-    public Spearman(int spawnPoint, int speed, int health, Player player) throws IOException{
-        this(0, 0, speed, health, player);
+    /**
+     * Spawn point based constructor.
+     * @param spawnPoint spawn point in which the enemy is to be spawned.
+     * @param speed sets the speed of the character.
+     * @param health sets amount of maximum health of the character.
+     * @throws IOException if there is problem with reading animation files.
+     */
+    public Spearman(int spawnPoint, int speed, int health) throws IOException{
+        this(0, 0, speed, health);
         
         if(spawnPoint == 1){
             this.x = Spawner.spawnPointOneX - (characterWidth / 2);
@@ -82,75 +96,11 @@ public class Spearman extends Enemy{
             this.x = Spawner.spawnPointTwoX - (characterWidth / 2);
             this.y = Spawner.spawnPointTwoY - characterHeight;
         }
-        this.pathFinder = new PathFinder(this, player, spawnPoint);        
+        this.pathFinder = new PathFinder(this, spawnPoint);        
     }
-    /*
-    @Override
-    public void draw(Graphics graphics, Game observer) throws EnemyDiesException{
-         
-        try{
-            if(isIdle){
-                idleAnimation.updateDirection(isHeadedRight);
-                idleAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);    
-            }
-            if(isMoving){
-                walkAnimation.updateDirection(isHeadedRight);
-                walkAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);
-            }
-            if(isAttacking){
-                attackAnimation.updateDirection(isHeadedRight);
-                attackAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);
-            }
-            if(takesDamage){
-                hurtAnimation.updateDirection(isHeadedRight);
-                hurtAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);
-                bloodAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);
-            }
-            if(isDying){
-                dieAnimation.updateDirection(isHeadedRight);
-                dieAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);
-            }
-            if(isFreezing){
-                idleAnimation.updateDirection(isHeadedRight);
-                idleAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);
-                idleAnimation.freeze(2);
-                freezeAnimation.run(freezeAnimationWidth, freezeAnimationHeight, graphics, observer);
-            }
-            else if(isFrozen){
-                idleAnimation.updateDirection(isHeadedRight);
-                idleAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);
-                frozenAnimation.run(freezeAnimationWidth, freezeAnimationHeight, graphics, observer);
-                //System.out.println("Is frozen!");
-            }
-        }catch(EndOfDieException e){
-            dieAnimation.reset();
-            throw new EnemyDiesException(this);
-        }catch(EndOfGetHurtException e){
-            takesDamage = false;
-            hurtAnimation.reset();
-            bloodAnimation.reset();
-        }catch(EndOfAttackException e){
-            isAttacking = false;
-            attackAnimation.reset();
-        }catch(EndOfBloodException e){
-            bloodAnimation.reset();
-        }catch(EndOfFreezeException e){
-            isFrozen = true;
-            isFreezing = false; 
-            freezeAnimation.reset();
-        }catch(EndOfFrozenException e){
-            isFrozen = false;
-            isLocked = false;
-            frozenAnimation.reset();
-            System.out.println("End of frozen!");
-        }
-        graphics.drawRect(boundsBox.x, boundsBox.y, boundsBox.width, boundsBox.height);
-        graphics.drawRect(leftRangeBox.x, leftRangeBox.y, leftRangeBox.width, leftRangeBox.height);
-        graphics.drawRect(rightRangeBox.x, rightRangeBox.y, rightRangeBox.width, rightRangeBox.height);
-        graphics.setColor(Color.red);
-        graphics.fillRect(healthBar.x, healthBar.y, health * healthBarWidth / maxHealth, healthBarHeight);
-        graphics.setColor(Color.black);
-        
-    }*/
     
+    // METHODS.
+    
+    // SETTERS AND GETTERS.
+
 }

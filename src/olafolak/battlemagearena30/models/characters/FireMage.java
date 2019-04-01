@@ -19,21 +19,37 @@ import olafolak.battlemagearena30.models.game.Spawner;
 import olafolak.battlemagearena30.models.sprites.BoundsBox;
 
 /**
- *
+ * Extends enemy class with characteristic elements of the firemage enemy type.
  * @author OlafPC
  */
 public class FireMage extends Enemy{
     
+    // FIELDS.
+    
+    /** The width of the visual representation.**/
     private int characterWidth = (int)(WINDOW_WIDTH * 50 / 1280);
+    /** The height of the visual representation.**/
     private int characterHeight = (int)(WINDOW_HEIGHT * 50 / 768);
+    /** The width of the basic animations' frames.**/
     private int frameWidth = (int)(1.3 * characterWidth);
+    /** The height of the basic animations' frames.**/
     private int frameHeight = (int)(1.3 * characterHeight);
+    /** The width of the freeze animation frames.**/
     private int freezeAnimationWidth = (int)(2.5 * characterWidth);
+    /** The height of the freeze animation frames.**/
     private int freezeAnimationHeight = (int)(2.5 * characterHeight);
     
-    
-    public FireMage(int x, int y, int speed, int health, Player player) throws IOException {
-        super(x, y, speed, health, player);
+    // CONSTRUCTORS.
+    /**
+     * Basic constructor.
+     * @param x sets the x position of the visual representation.
+     * @param y sets the y position of the visual representation.
+     * @param speed sets the speed of the character.
+     * @param health sets amount of maximum health of the character.
+     * @throws IOException if there is problem with reading animation files.
+     */
+    public FireMage(int x, int y, int speed, int health) throws IOException {
+        super(x, y, speed, health);
         
         progressValue = 30;
         
@@ -61,8 +77,15 @@ public class FireMage extends Enemy{
         baseline = new BoundsBox(baseX, baseY, characterWidth, 1);
     }
     
-    public FireMage(int spawnPoint, int speed, int health, Player player) throws IOException{
-        this(0, 0, speed, health, player);
+    /**
+     * Spawn point based constructor.
+     * @param spawnPoint spawn point in which the enemy is to be spawned.
+     * @param speed sets the speed of the character.
+     * @param health sets amount of maximum health of the character.
+     * @throws IOException if there is problem with reading animation files.
+     */
+    public FireMage(int spawnPoint, int speed, int health) throws IOException{
+        this(0, 0, speed, health);
         
         if(spawnPoint == 1){
             this.x = Spawner.spawnPointOneX - (characterWidth / 2);
@@ -71,7 +94,7 @@ public class FireMage extends Enemy{
             this.x = Spawner.spawnPointTwoX - (characterWidth / 2);
             this.y = Spawner.spawnPointTwoY - characterHeight;
         }
-        this.pathFinder = new PathFinder(this, player, spawnPoint);        
+        this.pathFinder = new PathFinder(this, spawnPoint);        
     }
     
     

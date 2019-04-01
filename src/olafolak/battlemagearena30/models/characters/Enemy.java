@@ -27,65 +27,80 @@ import olafolak.battlemagearena30.models.game.Spawner;
 import olafolak.battlemagearena30.models.utilities.AudioPlayer;
 
 /**
- *
- * @author OlafPC
+ * Enemy class for extending the character class by functionality characteristic for enemy.
+ * @author OlfOlak
  */
-public class Enemy extends Character implements CharacterInterface{
+public abstract class Enemy extends Character implements CharacterInterface{
 
+    // FIELDS.
+    
     // Technical fields.
+    /** Stores animation of taking damage action.**/
     protected GetHurtAnimation hurtAnimation;
+    /** Stores animation of death action.**/
     protected DieAnimation dieAnimation;
+    /** Stores blood effet animation.**/
     protected BloodAnimation bloodAnimation;
+    /** Stores animation of freezing.**/
     protected FreezeAnimation freezeAnimation;
+    /** Stores animation of being frozen.**/
     protected FrozenAnimation frozenAnimation;
+    /** Indicates if player is in enemy's range box.**/
     protected boolean playerInRange = false;
+    /** Indicates possibility of attacking the player.**/
     protected boolean canAttack = true;
+    /** Indicates if enemy is freezing.**/
     protected boolean isFreezing = false;
+    /** Indicates if enemy is frozen.**/
     protected boolean isFrozen = false;
+    /** Amount of progress points that will be added by killing the enemy.**/
     protected int progressValue;
+    /** Controls the movement of the enemy to get the player in range.**/
     protected PathFinder pathFinder;
+    /** Counts the delay of the next attack possibility.**/
     protected int attackTimer = 0;
-    protected Player player;
+    /** Reference to player object.**/
+    protected Player player = Game.player; 
     
     // Sounds.
+    /** Plays walking sound.**/
     private AudioPlayer walkSound;
+    /** Plays melee attack sound.**/
     private AudioPlayer meleeAttackSound;
+    /** Plays taking damage sound.**/
     private AudioPlayer hurtSound;
     
     // Bounds.
+    /** The width of the visual representation.**/
     private int characterWidth = 50;
+    /** The height of the visual representation.**/
     private int characterHeight = 50;
+    /** The width of the basic animations' frames.**/
     private int frameWidth = (int)(1.4 * characterWidth);
+    /** The height of the basic animations' frames.**/
     private int frameHeight = (int)(1.4 * characterHeight);
+    /** The width of the freeze animation frames.**/
     private int freezeAnimationWidth = (int)(2.5 * characterWidth);
+    /** The height of the freeze animation frames.**/
     private int freezeAnimationHeight = (int)(2.5 * characterHeight);
     
     
-    
-    public Enemy(int x, int y, int speed, int health, Player player) throws IOException {
+    // CONSTRUCTORS.
+    /**
+     * Basic constructor.
+     * @param x sets the x position of the visual representation.
+     * @param y sets the y position of the visual representation.
+     * @param speed sets the speed of the character.
+     * @param health sets amount of maximum health of the character.
+     * @throws IOException if there is problem with reading animation files.
+     */
+    public Enemy(int x, int y, int speed, int health) throws IOException {
         super(x, y, speed, health);
         
-        this.pathFinder = new PathFinder(this, player, 0);
-        this.player = player;
+        this.pathFinder = new PathFinder(this, 0);
         this.progressValue = 10;
         isHeadedRight = false;
-        /*idleAnimation = new IdleAnimation(60, 0.85,
-                getAnimationFrames("src/res/sprites/w_warrior", "idle_left", 5, characterWidth, characterHeight),
-                getAnimationFrames("src/res/sprites/w_warrior", "idle_right", 5, characterWidth, characterHeight));
-        walkAnimation = new WalkAnimation(60, 0.7, 
-                getAnimationFrames("src/res/sprites/w_warrior", "walk_left", 5, characterWidth, characterHeight),
-                getAnimationFrames("src/res/sprites/w_warrior", "walk_right", 5, characterWidth, characterHeight));
-        attackAnimation = new AttackAnimation(60, 0.7,
-                getAnimationFrames("src/res/sprites/w_warrior", "attack_left", 5, characterWidth, characterHeight),
-                getAnimationFrames("src/res/sprites/w_warrior", "attack_right", 5, characterWidth, characterHeight));
-        hurtAnimation = new GetHurtAnimation(60, 0.5,
-                getAnimationFrames("src/res/sprites/w_warrior", "hurt_left", 5, characterWidth, characterHeight),
-                getAnimationFrames("src/res/sprites/w_warrior", "hurt_right", 5, characterWidth, characterHeight));
-        dieAnimation = new DieAnimation(60, 0.7, 
-                getAnimationFrames("src/res/sprites/w_warrior", "die_left", 5, characterWidth, characterHeight),
-                getAnimationFrames("src/res/sprites/w_warrior", "die_right", 5, characterWidth, characterHeight));
-        bloodAnimation = new BloodAnimation(60, 0.5, getAnimationFrames("src/res/effects/blood", "blood", 6, characterWidth, characterHeight), 1);
-        */
+        
         freezeAnimation = new FreezeAnimation(60, 2, getAnimationFrames("src/res/effects/freeze", "freeze", 6, freezeAnimationWidth, freezeAnimationHeight), this);
         frozenAnimation = new FrozenAnimation(60, 5, getAnimationFrames("src/res/effects/freeze", "frozen", 1, freezeAnimationWidth, freezeAnimationHeight), this);
         
@@ -99,8 +114,15 @@ public class Enemy extends Character implements CharacterInterface{
         }
     }
     
-    public Enemy(int spawnPoint, int speed, int health, Player player) throws IOException{
-        this(0, 0, speed, health, player);
+    /**
+     * Spawn point based constructor.
+     * @param spawnPoint spawn point in which the enemy is to be spawned.
+     * @param speed sets the speed of the character.
+     * @param health sets amount of maximum health of the character.
+     * @throws IOException if there is problem with reading animation files.
+     */
+    public Enemy(int spawnPoint, int speed, int health) throws IOException{
+        this(0, 0, speed, health);
         
         if(spawnPoint == 1){
             this.x = Spawner.spawnPointOneX - (characterWidth / 2);
@@ -109,9 +131,17 @@ public class Enemy extends Character implements CharacterInterface{
             this.x = Spawner.spawnPointTwoX - (characterWidth / 2);
             this.y = Spawner.spawnPointTwoY - characterHeight;
         }
-        this.pathFinder = new PathFinder(this, player, spawnPoint);        
+        this.pathFinder = new PathFinder(this, spawnPoint);        
     }
 
+    // METHODS.
+    
+    /**
+     * Overriden drawing method that switches animations and runs them.
+     * @param graphics target graphics to be drawed on.
+     * @param observer context of the drawed graphics.
+     * @throws EnemyDiesException when the enemy dies.
+     */
     @Override
     public void draw(Graphics graphics, Game observer) throws EnemyDiesException{
          
@@ -147,7 +177,6 @@ public class Enemy extends Character implements CharacterInterface{
                 idleAnimation.updateDirection(isHeadedRight);
                 idleAnimation.run(originX - frameWidth / 2, originY - frameHeight / 2, graphics, observer);
                 frozenAnimation.run(x, y, graphics, observer);
-                //System.out.println("Is frozen!");
             }
         }catch(EndOfDieException e){
             dieAnimation.reset();
@@ -159,12 +188,6 @@ public class Enemy extends Character implements CharacterInterface{
         }catch(EndOfAttackException e){
             isAttacking = false;
             attackAnimation.reset();
-            
-            /*try{
-                meleeAttackSound = new AudioPlayer("src/res/sounds/soundEffects/combat/swordSwish.wav", false);
-            }catch(Exception ex){
-
-            }*/
         }catch(EndOfBloodException e){
             bloodAnimation.reset();
         }catch(EndOfFreezeException e){
@@ -186,13 +209,16 @@ public class Enemy extends Character implements CharacterInterface{
         
     }
     
-    public void tick(Player player){
+    /**
+     * Clocking method for updating enemys data.
+     */
+    public void tick(){
         
-        moveToPlayer(player);
+        moveToPlayer();
         updateMovement();
         updateBounds(); 
         updateAnimations();
-        checkPlayerInRange(player);
+        checkPlayerInRange();
         
         if(attackTimer != 0)
             attackTimer++;
@@ -204,6 +230,9 @@ public class Enemy extends Character implements CharacterInterface{
 
     }
     
+    /**
+     * Controls movement depending on action variables and pdates movement and action flags.
+     */
     protected void updateMovement(){
         
         if(!isDying){
@@ -212,7 +241,6 @@ public class Enemy extends Character implements CharacterInterface{
                     if(!isAttacking){
 
                         if(!movesLeft && !movesRight && !movesUp && !movesDown){
-                            animState = 0;
                             isIdle = true;
                             isMoving = false;
                             /*try{
@@ -229,35 +257,29 @@ public class Enemy extends Character implements CharacterInterface{
                                 x -= speed;
                                 canGoRight = true;
                                 isHeadedRight = false;
-                                animState = 1;
                             }
                             if(movesRight && canGoRight){
                                 x += speed;
                                 canGoLeft = true;
                                 isHeadedRight = true;
-                                animState = 1;
                             }
                             if(movesUp && canGoUp){
                                 y -= speed;
                                 canGoDown = true;
-                                animState = 1;
                             }
                             if(movesDown && canGoDown){
                                 y += speed;
                                 canGoUp = true;
-                                animState = 1;
                             }
                             //walkSound.play();
                         }
                     }
                     else{
-                        animState = 2;
                         isIdle = false;
                         isMoving = false;
                     }
                 }
                 else{
-                    animState = 3;
                     isAttacking = false;
                     isIdle = false;
                     isMoving = false;
@@ -273,11 +295,12 @@ public class Enemy extends Character implements CharacterInterface{
             takesDamage = false;
             isIdle = false;
             isMoving = false;
-
-            animState = 4;
         }
     }
     
+    /**
+     * Clocks animations.
+     */
     private void updateAnimations(){
         
         idleAnimation.incrementTicks();
@@ -299,6 +322,10 @@ public class Enemy extends Character implements CharacterInterface{
         
     }
     
+    /**
+     * Decreases health by received damage and checks if enemy is not to be dead.
+     * @param damage the amount of health to be decresead.
+     */
     public void takeDamage(int damage) {
         
         health -= damage;
@@ -313,28 +340,37 @@ public class Enemy extends Character implements CharacterInterface{
         hurtSound.getClip().loop(1);
     }
     
+    /**
+     * Stops enemy's movement, locks him and proceeds to run the freezing animation.
+     */
     public void freeze(){
         stopMovement();
         isLocked = true;
         isFreezing = true;
     }
-
-    public void checkPlayerInRange(Player player){
+    
+    /**
+     * Check if player's origin is present in the enemy's range box.
+     */
+    public void checkPlayerInRange(){
         
-        if(isHeadedRight && rightRangeBox.contains(player.getOriginX(), player.getOriginY())){
+        if(isHeadedRight && rightRangeBox.contains(Game.player.getOriginX(), Game.player.getOriginY())){
             playerInRange = true;
         }
-        else if(!isHeadedRight && leftRangeBox.contains(player.getOriginX(), player.getOriginY())){
+        else if(!isHeadedRight && leftRangeBox.contains(Game.player.getOriginX(), Game.player.getOriginY())){
             playerInRange = true;
         }
         else
             playerInRange = false;
     }
     
-    public void moveToPlayer(Player player){
+    /**
+     * Sets enemy's control to follow the player.
+     */
+    public void moveToPlayer(){
         
         if(!playerInRange)
-            pathFinder.run(this, player);
+            pathFinder.run();
         else{
             movesLeft = false;
             movesRight = false;
@@ -349,63 +385,13 @@ public class Enemy extends Character implements CharacterInterface{
         isAttacking = true;
         attackTimer = 1;   
         meleeAttackSound.getClip().loop(1);
-        player.takeDamage(10);
+        Game.player.takeDamage(10);
     }
     
-    // Setters and getters.
-    public Animation getIdleRightAnimation() {
-        return idleRightAnimation;
-    }
-
-    public void setIdleRightAnimation(Animation idleRightAnimation) {
-        this.idleRightAnimation = idleRightAnimation;
-    }
-
-    public Animation getIdleLeftAnimation() {
-        return idleLeftAnimation;
-    }
-
-    public void setIdleLeftAnimation(Animation idleLeftAnimation) {
-        this.idleLeftAnimation = idleLeftAnimation;
-    }
-
-    public Animation getWalkRightAnimation() {
-        return walkRightAnimation;
-    }
-
-    public void setWalkRightAnimation(Animation walkRightAnimation) {
-        this.walkRightAnimation = walkRightAnimation;
-    }
-
-    public Animation getWalkLeftAnimation() {
-        return walkLeftAnimation;
-    }
-
-    public void setWalkLeftAnimation(Animation walkLeftAnimation) {
-        this.walkLeftAnimation = walkLeftAnimation;
-    }
-
-    public Animation getAttackRightAnimation() {
-        return attackRightAnimation;
-    }
-
-    public void setAttackRightAnimation(Animation attackRightAnimation) {
-        this.attackRightAnimation = attackRightAnimation;
-    }
-
-    public Animation getAttackLeftAnimation() {
-        return attackLeftAnimation;
-    }
-
-    public void setAttackLeftAnimation(Animation attackLeftAnimation) {
-        this.attackLeftAnimation = attackLeftAnimation;
-    }
-
-
+    // SETTERS AND GETTERS.
     public Animation getFreezeAnimation() {
         return freezeAnimation;
     }
-
 
     public boolean isPlayerInRange() {
         return playerInRange;

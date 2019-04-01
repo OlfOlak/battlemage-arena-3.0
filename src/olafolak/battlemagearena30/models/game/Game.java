@@ -15,19 +15,14 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import javafx.embed.swing.JFXPanel;
 import javax.imageio.ImageIO;
 import olafolak.battlemagearena30.models.characters.Enemy;
 import olafolak.battlemagearena30.models.utilities.KeyControl;
 import olafolak.battlemagearena30.models.characters.Player;
 import olafolak.battlemagearena30.models.characters.Character;
-import olafolak.battlemagearena30.models.characters.FireMage;
-import olafolak.battlemagearena30.models.characters.Spearman;
-import olafolak.battlemagearena30.models.exceptions.CharacterDiesException;
 import olafolak.battlemagearena30.models.exceptions.EndOfBreakException;
 import olafolak.battlemagearena30.models.exceptions.EndOfMagicShieldException;
 import olafolak.battlemagearena30.models.exceptions.EnemyDiesException;
-import olafolak.battlemagearena30.models.exceptions.EnemySpawnedException;
 import olafolak.battlemagearena30.models.exceptions.PlayerDiesException;
 import olafolak.battlemagearena30.models.exceptions.WaveEndedException;
 import olafolak.battlemagearena30.models.exceptions.animationexceptions.EndOfCastFireballException;
@@ -40,53 +35,75 @@ import olafolak.battlemagearena30.models.world.Arena;
 
 
 /**
- *
- * @author OlafPC
+ * Main class for setting, controlling and viewing actual game(fights, spawning enemys).
+ * @author OlfOlak
  */
 public class Game extends Canvas implements Runnable {
 
+    
+    // FIELDS.
+    
+    /** Static field for scaling the game window. **/
     public static final int SCALE = 5;
+    /** Static field for window width constant. **/
     public static final double WIDTH = 256.0;
+    /** Static field for window height constant. **/
     public static final double HEIGHT = WIDTH * 0.6;
+    /** Static field for final window width constant. **/
     public static final double WINDOW_WIDTH = WIDTH * SCALE;
+    /** Static field for final window height constant. **/
     public static final double WINDOW_HEIGHT = HEIGHT * SCALE;
     
+    /** Game window title field. **/
     public final String TITLE = "Battlemage Arena 3.0";
     
+    /** Determines if game is running. **/
     private boolean running = false;
-    private Thread thread;
-    
-    private BufferedImage background = new BufferedImage((int)WINDOW_WIDTH, (int)WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
-    
-    private Spawner spawner;
-    
-    public static Player player;
-    private Enemy enemy;
-    private Arena arena;
-    private PlayerPanel playerPanel;
-    private ProgressPanel progressPanel;
-    private NextWaveCounter nextWaveCounter;
-    
+    /** Determines if theres interwave break. **/
     private boolean breakRuns = false;
     
-    private ArrayList<Character> renderQueue = new ArrayList<>();
-    private ArrayList<Enemy> abovePlayerRenderQueue;
-    private ArrayList<Enemy> belowPlayerRenderQueue;
+    /** Main thread field.**/
+    private Thread thread;
     
+    /** Enemys spawner field. **/
+    private Spawner spawner;
+    /** Player object field. **/
+    public static Player player;
+    /** Arena field.**/
+    private Arena arena;
+    /** Players panel field. **/
+    private PlayerPanel playerPanel;
+    /** Wave progress panel field. **/
+    private ProgressPanel progressPanel;
+    /** Break counter field. **/
+    private NextWaveCounter nextWaveCounter;
+    
+    /** List of all spawned enemys. **/
+    public ArrayList<Enemy> allEnemysList;
+    /** List of all characters to render. **/
+    private ArrayList<Character> renderQueue;
+    
+    /** Graphics instance for rendering. **/
     private Graphics graphics;
+    /** Background image field. **/
+    private BufferedImage background;
     
-    final JFXPanel fxPanel = new JFXPanel();;
+    /** Background music player. **/
     private AudioPlayer bgMusic;
 
-    public ArrayList<Enemy> allEnemysList;
+    // METHODS.
     
-    
+    /**
+     * Method initiating game with its components (Arena, enemys spawner, player, hud).
+     */
     public void init(){
         requestFocus();
         addKeyListener(new KeyControl(this));
         try{
+            background = new BufferedImage((int)WINDOW_WIDTH, (int)WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
             arena = new Arena((WINDOW_WIDTH), (WINDOW_HEIGHT));
             allEnemysList = new ArrayList<>();
+            renderQueue = new ArrayList<>();
             spawner = new Spawner(1, allEnemysList);
             playerPanel = new PlayerPanel(0, 700, 100, 100, 1, 1, 5, 5, 5);
             progressPanel = new ProgressPanel((int)(WINDOW_WIDTH - (0.2 * WINDOW_WIDTH)), 700, 3, spawner.getWaveOverallProgress());
@@ -95,9 +112,9 @@ public class Game extends Canvas implements Runnable {
             player = new Player(100, 100, 7, 100, 100);
             renderQueue.add(player);
             
-            /*enemy = new FireMage(400, 600, 0, 150, player);
+            /*enemy = new FireMage(400, 600, 0, 150);
             allEnemysList.add(enemy);
-            enemy = new Spearman(700, 300, 0, 150, player);
+            enemy = new Spearman(700, 300, 0, 150);
             allEnemysList.add(enemy);*/
             
             background = ImageIO.read(new File("src/res/world/arenaTiles/bg.png"));
@@ -116,6 +133,9 @@ public class Game extends Canvas implements Runnable {
         
     }
     
+    /**
+     * Starts game's main thread.
+     */
     public synchronized void start(){
         
         if(running)
@@ -126,6 +146,9 @@ public class Game extends Canvas implements Runnable {
         thread.start();
     }
     
+    /**
+     * Stops game's main thread.
+     */
     private synchronized void stop() {
         
         if(!running)
@@ -142,6 +165,9 @@ public class Game extends Canvas implements Runnable {
         System.exit(1);
     }
     
+    /**
+     * Run method that works out 60 fps and runs updating and rendering methods.
+     */
     @Override
     public void run() {
         
@@ -179,6 +205,9 @@ public class Game extends Canvas implements Runnable {
         
     }
     
+    /**
+     * Clocking method that updates games data.
+     */
     private void tick(){
         
         player.tick();
@@ -212,11 +241,14 @@ public class Game extends Canvas implements Runnable {
         
         // TODO: Delete updating with player parameter.
         for(Enemy e : allEnemysList){
-            e.tick(player);
+            e.tick();
         }
         
     }
     
+    /**
+     * Rendering method that updates game graphics instance.
+     */
     private void render(){
         
         BufferStrategy bs = this.getBufferStrategy();
@@ -235,7 +267,7 @@ public class Game extends Canvas implements Runnable {
             updateRenderQueue();
             for(Character c : renderQueue){
                 if(c == player)
-                    player.draw(graphics, this, 0);
+                    player.draw(graphics, this);
                 else
                     c.draw(graphics, this);
             }
@@ -256,7 +288,7 @@ public class Game extends Canvas implements Runnable {
             playerPanel.fireballCooldown();
         }catch(EndOfCastIceBreathException e){
             playerPanel.iceBreathCooldown();
-        }catch(CharacterDiesException e){
+        }catch(Exception e){
             
         }
         
@@ -270,6 +302,10 @@ public class Game extends Canvas implements Runnable {
         
     }
     
+    /**
+     * Method that check if any key is pressed.
+     * @param e indicates which key has been pressed.
+     */
     public void keyPressed(KeyEvent e){
         int key = e.getKeyCode();
         
@@ -318,6 +354,10 @@ public class Game extends Canvas implements Runnable {
         }
     }
     
+    /**
+     * Method that check if any of the pressed keys is being released.
+     * @param e indicates which key has been released.
+     */
     public void keyReleased(KeyEvent e){
         int key = e.getKeyCode();
         
@@ -339,6 +379,13 @@ public class Game extends Canvas implements Runnable {
         }
     }
     
+    /**
+     * Static method for scaling input image to desired dimensions.
+     * @param imageToScale input image.
+     * @param dWidth output width of the image.
+     * @param dHeight output height of the image.
+     * @return scaled image.
+     */
     private static BufferedImage scale(BufferedImage imageToScale, int dWidth, int dHeight) {
         BufferedImage scaledImage = null;
         if (imageToScale != null) {
@@ -350,6 +397,9 @@ public class Game extends Canvas implements Runnable {
         return scaledImage;
     }
     
+    /**
+     * Method for switching order of the characters based on their y position.
+     */
     private void updateRenderQueue(){
         renderQueue.clear();
         renderQueue.addAll(allEnemysList);
@@ -357,12 +407,16 @@ public class Game extends Canvas implements Runnable {
         Collections.sort(renderQueue);
     }
     
+    /**
+     * Method for setting up the game for the next wave.
+     */
     private void nextWave(){
         spawner.nextWave();
         progressPanel.nextWave(spawner.getWaveOverallProgress());
         breakRuns = true;
     }
 
+    // SETTERS AND GETTERS.
     public boolean isRunning() {
         return running;
     }
@@ -377,10 +431,6 @@ public class Game extends Canvas implements Runnable {
 
     public void setThread(Thread thread) {
         this.thread = thread;
-    }
-
-    public void setBackground(BufferedImage background) {
-        this.background = background;
     }
 
     public Player getPlayer() {

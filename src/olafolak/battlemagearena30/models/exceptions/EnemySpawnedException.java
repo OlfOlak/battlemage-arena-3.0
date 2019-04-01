@@ -8,16 +8,25 @@ package olafolak.battlemagearena30.models.exceptions;
 import olafolak.battlemagearena30.models.characters.Enemy;
 
 /**
- *
- * @author OlafPC
+ * Exception class for distinguishing the spawn of enemy.
+ * @author OlfOlak
  */
 public class EnemySpawnedException extends Exception{
     
+    // FIELDS.
+    /** Stores reference to specific enemy object.**/
     private Enemy enemy;
     
+    // CONSTRUCTORS.
+    /**
+     * Basic constructor for carrying the reference of specific enemy objects.
+     * @param enemy reference to specific enemy object.
+     */
     public EnemySpawnedException(Enemy enemy){
         this.enemy = enemy;
     }
+    
+    // SETTERS AND GETTERS.
     
     public Enemy getEnemy(){
         return enemy;

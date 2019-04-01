@@ -8,12 +8,9 @@ package olafolak.battlemagearena30.models.exceptions.animationexceptions;
 import olafolak.battlemagearena30.models.exceptions.EndSingleAnimationException;
 
 /**
- *
- * @author OlafPC
+ * Exception class for distinguishing the end of magic shield absorbtion animation.
+ * @author OlfOlak
  */
 public class EndOfMagicShieldAbsorbException extends EndSingleAnimationException{
     
-    public EndOfMagicShieldAbsorbException(){
-        
-    }
 }

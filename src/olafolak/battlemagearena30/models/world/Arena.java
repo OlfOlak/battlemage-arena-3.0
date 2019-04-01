@@ -7,7 +7,6 @@ package olafolak.battlemagearena30.models.world;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -19,19 +18,33 @@ import static olafolak.battlemagearena30.models.game.Game.WINDOW_WIDTH;
 import olafolak.battlemagearena30.models.sprites.BoundsBox;
 
 /**
- *
- * @author OlafPC
+ * Generates visual arena, provides arena collision bounds.
+ * @author OlfOlak
  */
 public class Arena {
     
+    // FIELDS.
+    /** The width of the arena.**/
     private double width;
+    /** The height of the arena.**/
     private double height;
+    /** The number of arena tiles in width.**/
     private int tilesW = 20;
+    /** The number of arena tiles in height.**/
     private int tilesH = 12;
+    /** 2D list of tiles for arena generation.**/
     private ArrayList<ArrayList<BufferedImage>> tilesList;
+    /** Arena background for gap filling.**/
     private BufferedImage background;
+    /** The area in which the characters can move.**/
     public static BoundsBox movementArea;
     
+    // CONSTRUCTORS.
+    /**
+     * Basic constructor.
+     * @param w sets the width of the arena.
+     * @param h sets the height of the arena.
+     */
     public Arena(double w, double h){
         
         this.width = w;
@@ -57,6 +70,14 @@ public class Arena {
         
     }
     
+    // METHODS.
+    /**
+     * Method for scaling the input image into inputed width and height. 
+     * @param imageToScale image to be scaled.
+     * @param dWidth width of the output image.
+     * @param dHeight height of the output image.
+     * @return scaled image.
+     */
     private static BufferedImage scale(BufferedImage imageToScale, int dWidth, int dHeight) {
         BufferedImage scaledImage = null;
         if (imageToScale != null) {
@@ -68,6 +89,10 @@ public class Arena {
         return scaledImage;
     }
     
+    /**
+     * Generates proper arena base on set properties.
+     * @throws IOException when problems with file reading occur.
+     */
     private void generateArena() throws IOException{
 
         
@@ -258,6 +283,11 @@ public class Arena {
         System.out.println("Size of tilesList: " + tilesList.size());*/
     }
     
+    /**
+     * Draws the generated tiles of arena.
+     * @param graphics target graphics to be drawed on.
+     * @param observer context of the drawed graphics.
+     */
     public void draw(Graphics graphics, Game observer){
         
         //System.out.println("Size of tilesList: " + tilesList.size());
@@ -275,6 +305,6 @@ public class Arena {
         //graphics.drawLine(352, 700, 352, 800);
     }
     
-    
+    // SETTERS AND GETTERS.
     
 }

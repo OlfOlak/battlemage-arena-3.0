@@ -9,76 +9,113 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
-import olafolak.battlemagearena30.models.sprites.Sprite;
-import olafolak.battlemagearena30.models.animations.Animation;
 import olafolak.battlemagearena30.models.animations.AttackAnimation;
 import olafolak.battlemagearena30.models.animations.IdleAnimation;
 import olafolak.battlemagearena30.models.animations.WalkAnimation;
 import static olafolak.battlemagearena30.models.characters.Player.scale;
 import olafolak.battlemagearena30.models.exceptions.CharacterDiesException;
 import olafolak.battlemagearena30.models.game.Game;
-import static olafolak.battlemagearena30.models.game.Game.*;
 import olafolak.battlemagearena30.models.sprites.BoundsBox;
-import olafolak.battlemagearena30.models.world.Arena;
 import static olafolak.battlemagearena30.models.world.Arena.movementArea;
 
-
+/**
+ * Abstract class that describes widely understood character.
+ * @author OlfOlak
+ */
 public abstract class Character implements CharacterInterface, Comparable<Character>{
 
+    // FIELDS.
     // Technical fields.
+    /** The x position of the visual representation.**/
     protected int x;
+    /** The y position of the visual representation.**/
     protected int y;
+    /** The x position of center of the visual representation.**/
     protected int originX;
+    /** The y position of center of the visual representation.**/
     protected int originY;
+    /** The x position of center point in the bottom of the visual representation.**/
     protected int baseX;
+    /** The y position of center point in the bottom of the visual representation.**/
     protected int baseY;
+    /** The speed of movement.**/
     protected int speed;
+    /** Determines if character can move right.**/
     protected boolean canGoRight = true;
+    /** Determines if character can move left.**/
     protected boolean canGoLeft = true;
+    /** Determines if character can move up.**/
     protected boolean canGoUp = true;
+    /** Determines if character can move down.**/
     protected boolean canGoDown = true;
+    /** Indicates that character is on the move to the left.**/
     protected boolean movesLeft = false;
+    /** Indicates that character is on the move to the right.**/
     protected boolean movesRight = false;
+    /** Indicates that character is on the move up.**/
     protected boolean movesUp = false;
+    /** Indicates that character is on the move down.**/
     protected boolean movesDown = false;
+    /** Indicates that character is not moving at the moment.**/
     protected boolean isIdle = true;
+    /** Indicates that character is moving at the moment.**/
     protected boolean isMoving = false;
+    /** Indicates that character cannot move.**/
     protected boolean isLocked = false;
+    /** Indicates direction which the character is headed to.**/
     protected boolean isHeadedRight = true;
+    /** Indicates that character does the attacking action.**/
     protected boolean isAttacking = false;
+    /** Indicates that character does the dying action.**/
     protected boolean isDying = false;
+    /** Indicates that character does the receiving damage action.**/
     protected boolean takesDamage = false;
-    protected int animState = 0;
-    protected BufferedImage image;
+    /** Stores animation of idle action.**/
     protected IdleAnimation idleAnimation;
+    /** Stores animation of walk action.**/
     protected WalkAnimation walkAnimation;
+    /** Stores animation of attacking action.**/
     protected AttackAnimation attackAnimation;
-    protected Animation idleRightAnimation;
-    protected Animation idleLeftAnimation;
-    protected Animation walkRightAnimation;
-    protected Animation walkLeftAnimation;
-    protected Animation attackRightAnimation;
-    protected Animation attackLeftAnimation;
+    /** The frame of visual representation of the character.**/
     protected BoundsBox boundsBox;
+    /** Indicates the area of possible hurting the enemy on the left of the character.**/
     protected BoundsBox leftRangeBox;
+    /** Indicates the area of possible hurting the enemy on the right of the character.**/
     protected BoundsBox rightRangeBox;
+    /** Consists the dimensioning of the character's health bar.**/
     protected BoundsBox healthBar;
+    /** Bottom line of the bounds box.**/
     protected BoundsBox baseline;
-    protected Sprite sprite;
     
     // Attribute fields.
+    /** Current amount of character's health.**/
     protected int health;
+    /** Maximum amount of character's health.**/
     protected int maxHealth;
     
     // Bounds.
+    /** The width of the visual representation.**/
     private int characterWidth = 50;
+    /** The height of the visual representation.**/
     private int characterHeight = 50;
+    /** The width of the range box.**/
     protected int meleeRangeX = (int)(0.4 * characterWidth);
+    /** The height of the range box.**/
     protected int meleeRangeY = (int)(0.4 * characterHeight);
+    /** The width of the health bar.**/
     protected int healthBarWidth = characterWidth;
+    /** The height of the health bar.**/
     protected int healthBarHeight = (int)(0.1 * characterHeight);
 
-    // Constructors.
+    // CONSTRUCTORS.
+    /**
+     * Basic constructor.
+     * @param x sets the x position of the visual representation.
+     * @param y sets the y position of the visual representation.
+     * @param speed sets the speed of the character.
+     * @param health sets amount of maximum health of the character.
+     * @throws IOException if there is problem with reading animation files.
+     */
     public Character(int x, int y, int speed, int health) throws IOException {
         
         this.x = x;
@@ -99,15 +136,27 @@ public abstract class Character implements CharacterInterface, Comparable<Charac
 
     }
 
-    // Methods.
-    public void draw(Graphics graphics, Game observer) throws CharacterDiesException{
+    // METHODS.
+    /**
+     * Empty drawing method to be overloaded.
+     * @param graphics target graphics to be drawed on.
+     * @param observer context of the drawed graphics.
+     * @throws CharacterDiesException when character dies.
+     */
+    public void draw(Graphics graphics, Game observer) throws Exception{
         
     }
 
+    /**
+     * Clocking method for updating characters data.
+     */
     public void tick(){
 
     }
     
+    /**
+     * Stops the character's current movement.
+     */
     protected void stopMovement(){
         movesLeft = false;
         movesRight = false;
@@ -115,6 +164,9 @@ public abstract class Character implements CharacterInterface, Comparable<Charac
         movesDown = false;
     }
     
+    /**
+     * Updates bounds being relative to the character's posision (x,y).
+     */
     protected void updateBounds(){
         
         originX = x + (characterWidth / 2);
@@ -129,6 +181,9 @@ public abstract class Character implements CharacterInterface, Comparable<Charac
         
     }
     
+    /**
+     * Checks if character has came across arena's movement borders.
+     */
     protected void checkArenaCollisions(){
 
         if(baseX >= (movementArea.x + movementArea.width))
@@ -142,7 +197,13 @@ public abstract class Character implements CharacterInterface, Comparable<Charac
         
     }
     
-
+    /**
+     * Scales input image to given width and height.
+     * @param srcImg image to be scaled.
+     * @param w output width of the scaled image.
+     * @param h output height of the scaled image.
+     * @return scaled image.
+     */
     protected BufferedImage getScaledImage(Image srcImg, int w, int h){
 
         BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TRANSLUCENT);
@@ -154,6 +215,16 @@ public abstract class Character implements CharacterInterface, Comparable<Charac
         return resizedImg;
     }
     
+    /**
+     * Loads images from given source to be animations frames.
+     * @param source file source of the images to be loaded.
+     * @param filename general name of every's image file.
+     * @param fileCount number of file to be loaded, counted from 1.
+     * @param width width of the loaded image.
+     * @param height height of the loaded image/
+     * @return list of images.
+     * @throws IOException when there is problem with reading any image file.
+     */
     protected ArrayList<BufferedImage> getAnimationFrames(String source, String filename, int fileCount, int width, int height) throws IOException{
         
         ArrayList<BufferedImage> tmp = new ArrayList<>();
@@ -174,6 +245,11 @@ public abstract class Character implements CharacterInterface, Comparable<Charac
         return tmp;
     }
     
+    /**
+     * Overriden method from Comparable Interface enabling comparison of the character type objects by their y position.
+     * @param ch character type object to be compared to.
+     * @return 0 if objects on the same y position, 1 if compared objects is higher placed, -1 if lower placed.
+     */
     @Override 
     public int compareTo(Character ch){
         if(y == ch.getY())  
@@ -184,7 +260,7 @@ public abstract class Character implements CharacterInterface, Comparable<Charac
             return -1;  
     }
 
-    // Setters and getters.    
+    // SETTERS AND GETTERS.    
 
     public int getX() {
         return x;
@@ -346,70 +422,6 @@ public abstract class Character implements CharacterInterface, Comparable<Charac
         this.takesDamage = takesDamage;
     }
 
-    public int getAnimState() {
-        return animState;
-    }
-
-    public void setAnimState(int animState) {
-        this.animState = animState;
-    }
-
-    public BufferedImage getImage() {
-        return image;
-    }
-
-    public void setImage(BufferedImage image) {
-        this.image = image;
-    }
-
-    public Animation getIdleRightAnimation() {
-        return idleRightAnimation;
-    }
-
-    public void setIdleRightAnimation(Animation idleRightAnimation) {
-        this.idleRightAnimation = idleRightAnimation;
-    }
-
-    public Animation getIdleLeftAnimation() {
-        return idleLeftAnimation;
-    }
-
-    public void setIdleLeftAnimation(Animation idleLeftAnimation) {
-        this.idleLeftAnimation = idleLeftAnimation;
-    }
-
-    public Animation getWalkRightAnimation() {
-        return walkRightAnimation;
-    }
-
-    public void setWalkRightAnimation(Animation walkRightAnimation) {
-        this.walkRightAnimation = walkRightAnimation;
-    }
-
-    public Animation getWalkLeftAnimation() {
-        return walkLeftAnimation;
-    }
-
-    public void setWalkLeftAnimation(Animation walkLeftAnimation) {
-        this.walkLeftAnimation = walkLeftAnimation;
-    }
-
-    public Animation getAttackRightAnimation() {
-        return attackRightAnimation;
-    }
-
-    public void setAttackRightAnimation(Animation attackRightAnimation) {
-        this.attackRightAnimation = attackRightAnimation;
-    }
-
-    public Animation getAttackLeftAnimation() {
-        return attackLeftAnimation;
-    }
-
-    public void setAttackLeftAnimation(Animation attackLeftAnimation) {
-        this.attackLeftAnimation = attackLeftAnimation;
-    }
-
     public BoundsBox getBoundsBox() {
         return boundsBox;
     }
@@ -440,14 +452,6 @@ public abstract class Character implements CharacterInterface, Comparable<Charac
 
     public void setHealthBar(BoundsBox healthBar) {
         this.healthBar = healthBar;
-    }
-
-    public Sprite getSprite() {
-        return sprite;
-    }
-
-    public void setSprite(Sprite sprite) {
-        this.sprite = sprite;
     }
 
     public int getHealth() {

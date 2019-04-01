@@ -12,10 +12,12 @@ import olafolak.battlemagearena30.models.exceptions.EndSingleAnimationException;
 import olafolak.battlemagearena30.models.game.Game;
 
 /**
- *
- * @author OlafPC
+ * Enables controlling and drawing sets of uploaded images in set time.
+ * @author OlfOlak
  */
 public class Animation {
+    
+    // FIELDS.
     
     protected int fps;
     protected double length;
@@ -29,7 +31,14 @@ public class Animation {
     protected int freezeTimerDuration;
     protected boolean isFrozen;
     
-    
+    // CONSTRUCTORS.
+    /**
+     * Basic constructor.
+     * @param fps informs in what fps the animation is run.
+     * @param length how long does one cycle of animation lasts.
+     * @param inputFrames list of images that animation consists of.
+     * @param mode 0 for infinite loop of animation, other values indicate numbers of cicles.
+     */
     public Animation(int fps, double length, ArrayList<BufferedImage> inputFrames, int mode){
         this.fps = fps;
         this.length = length;
@@ -40,7 +49,16 @@ public class Animation {
         
     }
     
-    // Methods.
+    // METHODS.
+    
+    /**
+     * Switches the animation frames in time and draws them.
+     * @param x the x posision of the drawed frames.
+     * @param y the y posision of the drawed frames.
+     * @param graphics target graphics to be drawed on.
+     * @param observer context of the drawed graphics.
+     * @throws EndSingleAnimationException when the single cicle of the animation ends.
+     */
     public void run(double x, double y, Graphics graphics, Game observer) throws EndSingleAnimationException{
         
         double frameLength = length * fps / frames;
@@ -74,21 +92,31 @@ public class Animation {
             
     }
     
+    /**
+     * Resets animation's to the initial state.
+     */
     public void reset(){
         ticks = 0;
         state = 0;
     }
     
+    /**
+     * Increments the clocking.
+     */
     public void incrementTicks(){
         ticks++;
     }
     
+    /**
+     * Freezes animation for specified time.
+     * @param duration how long the animation is to be freezed, in seconds.
+     */
     public void freeze(int duration){
         freezeTimerDuration = 60 * duration;
         isFrozen = true;
     }
     
-    // Setters and getters.
+    // SETTERS AND GETTERS.
     public int getFps() {
         return fps;
     }
@@ -129,15 +157,5 @@ public class Animation {
         this.state = state;
     }
 
-    /*public ArrayList<Image> getFramesList() {
-        return framesList;
-    }
 
-    public void setFramesList(ArrayList<Image> framesList) {
-        this.framesList = framesList;
-    }*/
-
-
-    
-    
 }

@@ -8,13 +8,9 @@ package olafolak.battlemagearena30.models.exceptions.animationexceptions;
 import olafolak.battlemagearena30.models.exceptions.EndSingleAnimationException;
 
 /**
- *
- * @author OlafPC
+ * Exception class for distinguishing the ice breath casting animation.
+ * @author OlfOlak
  */
 public class EndOfCastIceBreathException extends EndSingleAnimationException{
-    
-    public EndOfCastIceBreathException(){
-        
-    }
     
 }

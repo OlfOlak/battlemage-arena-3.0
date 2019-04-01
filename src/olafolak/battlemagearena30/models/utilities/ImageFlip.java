@@ -19,9 +19,9 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 public class ImageFlip {
     /**
-    * This method flips the image horizontally
-    * @param img --> BufferedImage Object to be flipped horizontally
-    * @return
+    * This method flips the image horizontally.
+    * @param img BufferedImage Object to be flipped horizontally.
+    * @return flipped image.
     */
     public BufferedImage horizontalflip(BufferedImage img) {
         int w = img.getWidth();
@@ -48,9 +48,9 @@ public class ImageFlip {
         return dimg;
     }
     /**
-    * This method flips the image vertically
-    * @param img --> BufferedImage object to be flipped
-    * @return
+    * This method flips the image vertically.
+    * @param img BufferedImage object to be flipped.
+    * @return flipped image.
     */
     public BufferedImage verticalflip(BufferedImage img) {
     int w = img.getWidth();
@@ -63,9 +63,9 @@ public class ImageFlip {
     return dimg;
     }
     /**
-    * This method reads an image from the file
-    * @param fileLocation -- > eg. "C:/testImage.jpg"
-    * @return BufferedImage of the file read
+    * This method reads an image from the file.
+    * @param fileLocation eg. "C:/testImage.jpg".
+    * @return BufferedImage of the file read.
     */
     public BufferedImage readImage(String fileLocation) {
     BufferedImage img = null;
@@ -78,9 +78,9 @@ public class ImageFlip {
     }
     /**
     * This method writes a buffered image to a file
-    * @param img -- > BufferedImage
-    * @param fileLocation --> e.g. "C:/testImage.jpg"
-    * @param extension --> e.g. "jpg","gif","png"
+    * @param img BufferedImage.
+    * @param fileLocation e.g. "C:/testImage.jpg".
+    * @param extension e.g. "jpg","gif","png".
     */
     public void writeImage(BufferedImage img, String fileLocation, String extension) {
 

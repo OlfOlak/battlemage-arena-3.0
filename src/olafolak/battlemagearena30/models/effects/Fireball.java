@@ -18,32 +18,58 @@ import olafolak.battlemagearena30.models.sprites.BoundsBox;
 import olafolak.battlemagearena30.models.utilities.AudioPlayer;
 
 /**
- *
- * @author OlafPC
+ * Describes thrown fireball effect, it's flying projectile and final explosion.
+ * @author OlfOlak
  */
 public class Fireball extends Effect{
     
+    // FIELDS.
     //Technical fields.
+    /** Stores animation fun during the movement of the projectile.**/
     private Animation flyAnimation;
+    /** Stores animation of explosion of the projectile.**/
     private Animation explosionAnimation;
+    /** Stores animation of smoke after explosion**/
     private Animation smokeAnimation;
+    /** Indicates if the projectile is flying.**/
     private boolean flys = true;
+    /** Indicates if the projectile is exploding.**/
     private boolean explodes = false;
+    /** Indicates if the explosionb dealt damage.**/
     private boolean dealtDamage = false;
+    /** Framing of the explosion animation.**/
     private BoundsBox explosionArea;
+    /** Framing of the progectile animation.**/
     private BoundsBox projectileArea;
+    /** Plays the sound of flying projectile.**/
     private AudioPlayer fireballSound;
+    /** Plays the sound of explosion.**/
     private AudioPlayer explosionSound;
     
     // Bounds.
+    /** The width of projectile animation.**/
     private int projectileWidth = (int)(0.6 * Player.characterWidth);
+    /** The height of projectile animation.**/
     private int projectileHeight = (int)(0.36 * Player.characterHeight);
+    /** The width of explosion animation.**/
     private int explosionWidth = (int)(3.0 * Player.characterWidth);
+    /** The height of explosion animation.**/
     private int explosionHeight = (int)(3.0 * Player.characterHeight);
+    /** The width of range box of the explosion.**/
     private int explosionAreaWidth = (int)(explosionWidth / 3);
+    /** The height of range box of the explosion.**/
     private int explosionAreaHeight = (int)(explosionHeight / 3);
     
-    
+    // CONSTRUCTORS.
+    /**
+     * Basic constructor.
+     * @param originX sets the x position of center of the projectile's animation.
+     * @param originY sets the y position of center of the projectile's animation.
+     * @param range sets the maximum distance of projectile's movement.
+     * @param rightDirection sets the direction of flight of the projectile.
+     * @param enemysList reference to list of all enemy objects in game.
+     * @throws IOException if problem with reading animation files occurs.
+     */
     public Fireball(int originX, int originY, int range, boolean rightDirection, ArrayList<Enemy> enemysList) throws IOException{
         
         super(originX, originY, range, rightDirection, enemysList);
@@ -70,6 +96,14 @@ public class Fireball extends Effect{
         fireballSound.play();
     }
     
+    // METHODS.
+    
+    /**
+     * Drawing method that switches animations and runs them.
+     * @param graphics target graphics to be drawed on.
+     * @param observer context of the drawed graphics.
+     * @throws EndOfFireballException when projectiles explodes.
+     */
     public void draw(Graphics graphics, Game observer) throws EndOfFireballException{
         
         try{
@@ -98,6 +132,9 @@ public class Fireball extends Effect{
         }
     }
     
+    /**
+     * Clocking method for updating effect's data.
+     */
     public void tick(){
         
         updateBounds();
@@ -125,6 +162,9 @@ public class Fireball extends Effect{
         }
     }
     
+    /**
+     * Updates bounds being relative to the effect's posision (x,y).
+     */
     private void updateBounds(){
         if(flys == true){
             originX = x + (projectileWidth / 2);
@@ -134,6 +174,9 @@ public class Fireball extends Effect{
         
     }
     
+    /**
+     * Runs through enemys list and deals damage to those in the explosion area.
+     */
     private void dealDamage(){
         
         
@@ -145,6 +188,10 @@ public class Fireball extends Effect{
         
     }
     
+    /**
+     * Checks if the flying projectile encounters any of the enemys on its way.
+     * @return true if enemy encountered, otherwise false.
+     */
     private boolean projectileMeetsEnemy(){
         
         for(Enemy e : enemysList){
@@ -154,7 +201,7 @@ public class Fireball extends Effect{
         return false;    
     }
     
-    // Setters and getters.
+    // SETTERS AND GETTERS.
     public int getX() {
         return x;
     }

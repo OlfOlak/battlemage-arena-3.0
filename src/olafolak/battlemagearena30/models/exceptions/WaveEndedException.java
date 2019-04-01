@@ -6,8 +6,8 @@
 package olafolak.battlemagearena30.models.exceptions;
 
 /**
- *
- * @author OlafPC
+ * Exception class for distinguishing the end of the wave.
+ * @author OlfOlak
  */
 public class WaveEndedException extends Exception{
     

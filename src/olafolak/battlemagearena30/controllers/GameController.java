@@ -7,11 +7,15 @@ import olafolak.battlemagearena30.models.game.Game;
 
 
 /**
- *
- * @author OlafPC
+ * @author OlfOlak
+ * @version 0.3.x
+ * Main class for controlling main game components (main menu, game, loading game etc.)
  */
 public class GameController {
 
+    /**
+     * Game type field for setting up a game.
+     */
     private static Game game;
     
     
