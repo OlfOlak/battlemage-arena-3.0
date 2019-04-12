@@ -25,6 +25,7 @@ public class GameController {
         
         mainMenu = new MainMenu();
         mainMenu.run(args);
+        
         /*game = new Game();
         
         game.setPreferredSize(new Dimension((int)(game.WINDOW_WIDTH), (int)(game.WINDOW_HEIGHT)));
